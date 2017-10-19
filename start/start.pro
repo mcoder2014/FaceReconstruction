@@ -32,18 +32,29 @@ INCLUDEPATH += E:/openCV-2.4.11/build/install/include \
                $$PWD/../dlib \
                $$PWD/../face_reconstruction/cereal \
                $$PWD/../face_reconstruction/glm \
+               $$PWD/../face_reconstruction \
                $$PWD
 
 LIBS += -L$$PWD/../libs -ldlib
 
 SOURCES += \
-        main.cpp \
-        MainWindow.cpp \
-    Face/FaccDetection.cpp
+    main.cpp \
+    GUI/MainWindow.cpp \
+    Face/FaccDetection.cpp \
+    Face/FitModel.cpp \
+    GUI/PicWidget.cpp \
+    GUI/ModelViewer.cpp \
+    GLOBAL_VAR.cpp
 
 HEADERS += \
-        MainWindow.h \
-    Face/FaccDetection.h
+    GUI/MainWindow.h \
+    Face/FaccDetection.h \
+    Face/FitModel.h \
+    GUI/PicWidget.h \
+    GUI/ModelViewer.h \
+    GLOBAL_VAR.h
 
 FORMS += \
-        MainWindow.ui
+    GUI/MainWindow.ui \
+    GUI/PicWidget.ui \
+    GUI/ModelViewer.ui
