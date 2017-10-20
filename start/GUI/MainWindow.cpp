@@ -4,6 +4,8 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QString>
+#include <QDebug>
+#include "Face/FaceDetection.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -24,6 +26,8 @@ MainWindow::~MainWindow()
 ///
 void MainWindow::init()
 {
+    this->picWidget = NULL;
+
     // 初始化QAction
     this->action_addimage = new QAction(tr("open Image Files"));
     this->action_addimage->setStatusTip(tr("Select a image and open it"));
@@ -56,7 +60,16 @@ void MainWindow::init()
     ui->mainToolBar->addAction(this->action_addimage);
     ui->mainToolBar->addAction(this->action_face_reconstruction);
 
+    initConnection();
+}
 
+void MainWindow::initConnection()
+{
+    connect(this->action_addimage, SIGNAL(triggered(bool)),
+            this, SLOT(openImage()));                       // 打开图片
+
+    connect(this->action_landmark, SIGNAL(triggered(bool)),
+            this, SLOT(faceDetection()));                   // 人脸监测
 }
 
 ///
@@ -74,6 +87,9 @@ void MainWindow::openImage()
     if(fileDialog->exec() == QDialog::Accepted)
     {
         QString path = fileDialog->selectedFiles()[0];      // 用户选择的文件名
+
+        qDebug() << "selected image file:"
+                 << path;
         this->setImage(path);
     }
 }
@@ -84,5 +100,27 @@ void MainWindow::openImage()
 ///
 void MainWindow::setImage(QString filePath)
 {
+    if(this->picWidget == NULL)
+    {
+        this->picWidget = new PicWidget();
+    }
 
+    this->setCentralWidget(this->picWidget);
+    this->picWidget->setImagePath(filePath);
+
+}
+
+///
+/// \brief MainWindow::faceDetection
+///
+void MainWindow::faceDetection()
+{
+    if(this->picWidget == NULL)
+        return;
+    QString filePath = this->picWidget->getImagePath();
+    if(filePath.size() == 0)
+         return;
+
+    FaceDetection detector;
+    detector.landmark(filePath);
 }

@@ -28,31 +28,53 @@ RCC_DIR = ../rcc        # .qrc文件转换后的位置
 OBJECTS_DIR = ../tmp    # 编译中间文件的位置
 
 INCLUDEPATH += E:/openCV-2.4.11/build/install/include \
-               E:/boost 1.50/boost_1_50_0/boost \
+               E:/boost1.50/boost_1_50_0 \
                $$PWD/../dlib \
                $$PWD/../face_reconstruction/cereal \
                $$PWD/../face_reconstruction/glm \
                $$PWD/../face_reconstruction \
-               $$PWD
+               $$PWD \
+               $$PWD/../libs/eigen-eigen-5a0156e40feb
 
-LIBS += -L$$PWD/../libs -ldlib
+LIBS += -L$$PWD/../libs -ldlib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_calib3d2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_contrib2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_core2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_features2d2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_flann2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_gpu2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_highgui2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_imgproc2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_legacy2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_ml2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_nonfree2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_objdetect2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_ocl2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_photo2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_stitching2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_superres2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_ts2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_video2411.lib \
+    ../../../openCV-2.4.11/build/install/lib/opencv_videostab2411.lib \
+    -LE:/boost1.50/build/lib -lboost_system-vc140-mt-1_50 -lboost_filesystem-vc140-mt-1_50
+
 
 SOURCES += \
     main.cpp \
     GUI/MainWindow.cpp \
-    Face/FaccDetection.cpp \
     Face/FitModel.cpp \
     GUI/PicWidget.cpp \
     GUI/ModelViewer.cpp \
-    GLOBAL_VAR.cpp
+    GLOBAL_VAR.cpp \
+    Face/FaceDetection.cpp
 
 HEADERS += \
     GUI/MainWindow.h \
-    Face/FaccDetection.h \
     Face/FitModel.h \
     GUI/PicWidget.h \
     GUI/ModelViewer.h \
-    GLOBAL_VAR.h
+    GLOBAL_VAR.h \
+    Face/FaceDetection.h
 
 FORMS += \
     GUI/MainWindow.ui \

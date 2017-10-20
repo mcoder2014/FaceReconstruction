@@ -12,7 +12,12 @@ GLOBAL_VAR *GLOBAL_VAR::getInstance()
     return m_instance;
 }
 
+///
+/// \brief GLOBAL_VAR::GLOBAL_VAR
+///
 GLOBAL_VAR::GLOBAL_VAR()
 {
-    this->landmarkdat = QString("shape_predictor_68_face_landmarks.dat");
+    this->landmarkdat = QString("./shape_predictor_68_face_landmarks.dat");
+    this->morphableModel = QString("./sfm_shape_3448.bin");
+    this->mappingsFile = QString("./ibug2did.txt");
 }

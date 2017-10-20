@@ -8,15 +8,19 @@ class GLOBAL_VAR
 
 
 public:
-    GLOBAL_VAR *getInstance();  // 获得实例
+    static GLOBAL_VAR *getInstance();  // 获得实例
 
     QString getLandmarkDat(){return this->landmarkdat;}
+    QString getMorphableModel(){return this->morphableModel;}
+    QString getMappingsFile(){return this->mappingsFile;}
 
 private:
     static GLOBAL_VAR *m_instance;
     GLOBAL_VAR();
 
     QString landmarkdat;
+    QString morphableModel;
+    QString mappingsFile;
 };
 
 #endif // GLOBAL_VAR_H

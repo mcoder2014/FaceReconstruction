@@ -22,6 +22,7 @@ public:
 private:
     Ui::MainWindow *ui;
     void init();            // 初始化程序
+    void initConnection();  // 链接QAction
 
     // QMenu
     QMenu *menu_file;                       // 文件菜单
@@ -39,9 +40,10 @@ private:
     // widget
     PicWidget *picWidget;
 
-
+private slots:
     void openImage();                       // 打开图片
     void setImage(QString filePath);        // 设置图片
+    void faceDetection();                   // 执行人脸检测
 };
 
 #endif // MAINWINDOW_H

@@ -194,7 +194,8 @@ OrthographicRenderingParameters estimate_orthographic_camera(std::vector<cv::Vec
 	const float aspect = static_cast<float>(width) / height;
 
 	// Set up the initial parameter vector and the cost function:
-	int num_params = 6;          //   俯仰值        偏航值       翻滚值
+	int num_params = 6;          //   俯仰值        偏航值       翻滚值test
+	
 	Eigen::VectorXd parameters; // [rot_x_pitch, rot_y_yaw, rot_z_roll, t_x, t_y, frustum_scale]
 	parameters.setConstant(num_params, 0.0); // Set all 6 values to zero (except frustum_scale, see next line)
 	parameters[5] = 110.0; // This is just a rough hand-chosen scaling estimate - we could do a lot better. But it works.
