@@ -44,6 +44,7 @@ private slots:
     void openImage();                       // 打开图片
     void setImage(QString filePath);        // 设置图片
     void faceDetection();                   // 执行人脸检测
+    void faceReconsturction();              // 执行人脸重建
 };
 
 #endif // MAINWINDOW_H

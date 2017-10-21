@@ -25,6 +25,7 @@ void PicWidget::setImagePath(QString path)
 
     // 更换图片
     QImage image(path);
+    this->image = image;
     QPixmap pic = QPixmap::fromImage(image);
 
 

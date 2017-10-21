@@ -56,7 +56,7 @@ LIBS += -L$$PWD/../libs -ldlib \
     ../../../openCV-2.4.11/build/install/lib/opencv_ts2411.lib \
     ../../../openCV-2.4.11/build/install/lib/opencv_video2411.lib \
     ../../../openCV-2.4.11/build/install/lib/opencv_videostab2411.lib \
-    -LE:/boost1.50/build/lib -lboost_system-vc140-mt-1_50 -lboost_filesystem-vc140-mt-1_50
+    -LE:/boost1.50/build/lib -lboost_system-vc140-mt-1_50 -lboost_filesystem-vc140-mt-1_50 -lboost_program_options-vc140-mt-1_50
 
 
 SOURCES += \
@@ -74,7 +74,7 @@ HEADERS += \
     GUI/PicWidget.h \
     GUI/ModelViewer.h \
     GLOBAL_VAR.h \
-    Face/FaceDetection.h
+    Face/FaceDetection.h \
 
 FORMS += \
     GUI/MainWindow.ui \

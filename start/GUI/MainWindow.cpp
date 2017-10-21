@@ -3,9 +3,11 @@
 #include "GUI/PicWidget.h"
 #include <QFileDialog>
 #include <QFile>
+#include <QDir>
 #include <QString>
 #include <QDebug>
 #include "Face/FaceDetection.h"
+#include "Face/FitModel.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -69,7 +71,10 @@ void MainWindow::initConnection()
             this, SLOT(openImage()));                       // 打开图片
 
     connect(this->action_landmark, SIGNAL(triggered(bool)),
-            this, SLOT(faceDetection()));                   // 人脸监测
+            this, SLOT(faceDetection()));                   // 人脸检测
+
+    connect(this->action_face_reconstruction, SIGNAL(triggered(bool)),
+            this, SLOT(faceReconsturction()));
 }
 
 ///
@@ -123,4 +128,39 @@ void MainWindow::faceDetection()
 
     FaceDetection detector;
     detector.landmark(filePath);
+}
+
+///
+/// \brief MainWindow::faceReconsturction
+///
+void MainWindow::faceReconsturction()
+{
+
+    FitModel fitmodel;                                      // 新建对象
+
+    if(this->picWidget == NULL)
+        return;
+    QString filePath = this->picWidget->getImagePath();
+    if(filePath.size() == 0)
+         return;
+
+
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setAcceptMode(QFileDialog::AcceptOpen);     // 打开文件模式
+    fileDialog->setFileMode(QFileDialog::Directory);     // 显示存在的文件
+    fileDialog->setViewMode(QFileDialog::Detail);           // 显示详细模式
+//    fileDialog->setNameFilter(tr("Image Files(*.jpg *.png)"));  // 过滤图片
+    fileDialog->setWindowTitle(tr("Choose a floder to save model"));    // 对话框标题
+    fileDialog->setDirectory(fitmodel.getOutputPath());
+
+    if(fileDialog->exec() == QDialog::Accepted)
+    {
+        QDir dir = fileDialog->directory();
+        fitmodel.setOutputPath(dir.absolutePath());
+        qDebug() << "selected directory: "
+                 << dir.absolutePath();
+
+        fitmodel.fitmodel(this->picWidget->getImage());
+        qDebug() <<"fit model finished";
+    }
 }

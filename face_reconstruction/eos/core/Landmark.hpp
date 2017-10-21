@@ -27,7 +27,7 @@
 #include <algorithm>
 
 namespace eos {
-	namespace core {
+namespace core {
 
 /**
  * @brief Representation of a landmark, consisting of a landmark name and
@@ -36,8 +36,8 @@ namespace eos {
 template<class LandmarkType>
 struct Landmark
 {
-	std::string name; ///< Name of the landmark, often used as identifier.
-	LandmarkType coordinates; ///< The position or coordinates of the landmark.
+    std::string name; ///< Name of the landmark, often used as identifier.
+    LandmarkType coordinates; ///< The position or coordinates of the landmark.
 };
 
 /**
@@ -56,16 +56,20 @@ template<class LandmarkType> using LandmarkCollection = std::vector<Landmark<Lan
 template<class T>
 LandmarkCollection<T> filter(const LandmarkCollection<T>& landmarks, const std::vector<std::string>& filter)
 {
-	LandmarkCollection<T> filtered_landmarks;
-	using std::begin;
-	using std::end;
-	std::copy_if(begin(landmarks), end(landmarks), std::back_inserter(filtered_landmarks),
-		[&](const Landmark<T>& lm) { return std::find(begin(filter), end(filter), lm.name) != end(filter); }
-	);
-	return filtered_landmarks;
+    LandmarkCollection<T> filtered_landmarks;
+    using std::begin;
+    using std::end;
+    std::copy_if(
+                begin(landmarks), end(landmarks), std::back_inserter(filtered_landmarks),
+                [&](const Landmark<T>& lm)
+    {
+        return std::find(begin(filter), end(filter), lm.name) != end(filter);
+    }
+    );
+    return filtered_landmarks;
 };
 
-	} /* namespace core */
+} /* namespace core */
 } /* namespace eos */
 
 #endif /* EOS_LANDMARK_HPP_ */

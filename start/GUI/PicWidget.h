@@ -2,6 +2,7 @@
 #define PICWIDGET_H
 
 #include <QWidget>
+#include <QImage>
 
 namespace Ui {
 class PicWidget;
@@ -15,6 +16,7 @@ public:
     explicit PicWidget(QWidget *parent = 0);
     ~PicWidget();
     QString getImagePath(){return imagePath;}
+    QImage getImage(){return this->image;}
 
 public slots:
     void setImagePath(QString path);
@@ -22,6 +24,7 @@ public slots:
 private:
     Ui::PicWidget *ui;
     QString imagePath;
+    QImage image;
 
 };
 
