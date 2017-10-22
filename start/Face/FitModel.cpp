@@ -74,7 +74,7 @@ void FitModel::fitmodel(QImage qimage)
                     str_i,
                     numPoint,
                     CV_FONT_HERSHEY_COMPLEX,
-                    1,
+                    0.5,
                     cv::Scalar(0, 0, 255));
         ++i;
     }
@@ -98,7 +98,11 @@ void FitModel::fitmodel(QImage qimage)
             continue;
         }
 
-        int vertex_idx = std::stoi(converted_name.get());
+        // 转换为int值
+//        int vertex_idx = std::stoi(converted_name.get());
+        int vertex_idx = QString::fromStdString(
+                    converted_name.get()).toInt();
+
         Vec4f vertex = morphable_model.get_shape_model().get_mean_at_point(vertex_idx);
         model_points.emplace_back(vertex);
         vertex_indices.emplace_back(vertex_idx);
@@ -106,7 +110,8 @@ void FitModel::fitmodel(QImage qimage)
     }
 
     /// Keegan.Ren
-    std::cout << "model_point = " ;
+    std::cout << "model_point = " << endl;
+    std::cout << "count model points:" << morphable_model.get_shape_model().get_mean().rows / 3.0 << endl;
     for (int i = 0; i < landmarks->size(); ++i) {
         //         3d points                                                    2d points
         std::cout << model_points[i] << "\t"
@@ -130,7 +135,8 @@ void FitModel::fitmodel(QImage qimage)
               << rendering_params.t_x << " "
               << rendering_params.t_y << endl;
 
-    std::cout << rendering_params.frustum.b << " "
+    std::cout << "frustum : "
+              << rendering_params.frustum.b << " "
               << rendering_params.frustum.l << " "
               << rendering_params.frustum.r << " "
               << rendering_params.frustum.t << endl;
@@ -158,11 +164,11 @@ void FitModel::fitmodel(QImage qimage)
     float yaw_angle = glm::degrees(rendering_params.r_y);
     float zaw_angle = glm::degrees(rendering_params.r_z);
     cout << "x_y_z_angle = ";
-    cout << xaw_angle << "\t" << yaw_angle << "\t" << zaw_angle;
+    cout << xaw_angle << "\t" << yaw_angle << "\t" << zaw_angle << endl;
     // and similarly for pitch (r_x) and roll (r_z).
 
 
-    cout << "size = " << fitted_coeffs.size();
+    cout << "size = " << fitted_coeffs.size() << endl;
     for (int i = 0; i < fitted_coeffs.size(); ++i)
         cout << fitted_coeffs[i] << endl;
 

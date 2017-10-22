@@ -29,34 +29,33 @@ OBJECTS_DIR = ../tmp    # 编译中间文件的位置
 
 INCLUDEPATH += E:/openCV-2.4.11/build/install/include \
                E:/boost1.50/boost_1_50_0 \
-               $$PWD/../dlib \
-               $$PWD/../face_reconstruction/cereal \
-               $$PWD/../face_reconstruction/glm \
-               $$PWD/../face_reconstruction \
+               $$PWD/../libs \
                $$PWD \
-               $$PWD/../libs/eigen-eigen-5a0156e40feb
+               $$PWD/../libs/eigen-eigen-b9cd8366d4e8
 
 LIBS += -L$$PWD/../libs -ldlib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_calib3d2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_contrib2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_core2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_features2d2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_flann2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_gpu2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_highgui2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_imgproc2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_legacy2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_ml2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_nonfree2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_objdetect2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_ocl2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_photo2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_stitching2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_superres2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_ts2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_video2411.lib \
-    ../../../openCV-2.4.11/build/install/lib/opencv_videostab2411.lib \
-    -LE:/boost1.50/build/lib -lboost_system-vc140-mt-1_50 -lboost_filesystem-vc140-mt-1_50 -lboost_program_options-vc140-mt-1_50
+E:\openCV-2.4.11\build\lib\Release\opencv_videostab2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_ts2411.lib   \
+E:\openCV-2.4.11\build\lib\Release\opencv_superres2411.lib  \
+E:\openCV-2.4.11\build\lib\Release\opencv_stitching2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_contrib2411.lib   \
+E:\boost1.50\build\lib\boost_system-vc140-mt-1_50.lib   \
+E:\boost1.50\build\lib\boost_filesystem-vc140-mt-1_50.lib   \
+E:\boost1.50\build\lib\boost_program_options-vc140-mt-1_50.lib  \
+E:\openCV-2.4.11\build\lib\Release\opencv_nonfree2411.lib   \
+E:\openCV-2.4.11\build\lib\Release\opencv_ocl2411.lib   \
+E:\openCV-2.4.11\build\lib\Release\opencv_gpu2411.lib   \
+E:\openCV-2.4.11\build\lib\Release\opencv_photo2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_objdetect2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_legacy2411.lib    \
+E:\openCV-2.4.11\build\lib\Release\opencv_video2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_ml2411.lib    \
+E:\openCV-2.4.11\build\lib\Release\opencv_calib3d2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_features2d2411.lib    \
+E:\openCV-2.4.11\build\lib\Release\opencv_highgui2411.lib   \
+E:\openCV-2.4.11\build\lib\Release\opencv_imgproc2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_flann2411.lib \
+E:\openCV-2.4.11\build\lib\Release\opencv_core2411.lib  \
 
 
 SOURCES += \
