@@ -10,11 +10,9 @@
 #include <eos/core/Landmark.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+
 #include <QString>
 #include <QImage>
-
-#define DLIB_PNG_SUPPORT
-#define DLIB_JPEG_SUPPORT
 
 using namespace dlib;
 using namespace std;
@@ -23,21 +21,22 @@ using namespace eos;
 using eos::core::Landmark;
 using eos::core::LandmarkCollection;
 
-using cv::Mat;
-using cv::Vec2f;
-using cv::Vec3f;
-using cv::Vec4f;
 using std::vector;
 using std::string;
 
 class FaceDetection
 {
 public:
-    FaceDetection();
+    static FaceDetection *getInstance();
     LandmarkCollection<cv::Vec2f> *landmark(QString filePath);
     LandmarkCollection<cv::Vec2f> *landmark(QImage image);
 
 private:
+    static FaceDetection* m_instance;
+    FaceDetection();
+
+    shape_predictor sp;        // 因为每次识别都要加载几十兆的素材
+
     LandmarkCollection<cv::Vec2f> *buildLandMarks(full_object_detection shape);
     array2d<rgb_pixel> *qimageToArray2d(QImage image);
 };

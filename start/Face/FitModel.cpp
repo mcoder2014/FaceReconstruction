@@ -11,26 +11,66 @@
 #include <eos/render/utils.hpp>
 #include <eos/render/texture_extraction.hpp>
 
+using cv::Vec2f;
+using cv::Vec3f;
+using cv::Vec4f;
+using std::cout;
+using std::endl;
+using std::vector;
+using std::string;
+
+FitModel *FitModel::m_instance = NULL;
+
 FitModel::FitModel()
 {
     this->outputPath = QDir::homePath();    // 默认文件路径
     this->fileName = QString("model");      // 默认文件名
+
+    GLOBAL_VAR *global = GLOBAL_VAR::getInstance();
+    QString mappingsfile = global->getMappingsFile();       // mapping file的路径
+
+    if(mappingsfile.size() == 0)
+    {
+        this->landmark_mapper = new LandmarkMapper();
+    }
+    else
+    {
+        this->landmark_mapper = new LandmarkMapper(mappingsfile.toStdString());
+    }
+
 }
+
+FitModel *FitModel::getInstance()
+{
+    if(m_instance == NULL)
+    {
+        m_instance = new FitModel();
+    }
+
+    return m_instance;
+}
+
 
 ///
 /// \brief FitModel::fitmodel
-/// \param image
-/// \param isomapPath
-/// \param outputfilePath
+/// \param image_path
 ///
-void FitModel::fitmodel(QImage qimage)
+void FitModel::fitmodel(QString image_path)
 {
-    FaceDetection detector;
-    LandmarkCollection<cv::Vec2f> *landmarks = detector.landmark(qimage);     // 先检测特征点
-    Mat image = this->QImage2cvMat(qimage);     // 将图像转换为cvMat
+
+    // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
+    Mat image = cv::imread(image_path.toStdString());
+
+    QImage qimage = this->cvMat2QImage(image);      // 转换为QImage；
+
+    // 检测特征点
+    FaceDetection *detector = FaceDetection::getInstance();
+    LandmarkCollection<cv::Vec2f> *landmarks = detector->landmark(qimage);     // 先检测特征点
+//    Mat image = this->QImage2cvMat(qimage);     // 将图像转换为cvMat
 
     GLOBAL_VAR *global = GLOBAL_VAR::getInstance();
 
+    // 可形变的模型
     morphablemodel::MorphableModel morphable_model;
     try
     {
@@ -42,56 +82,63 @@ void FitModel::fitmodel(QImage qimage)
         cout << "Error loading the Morphable Model: " << e.what() << endl;
         return;
     }
-    QString mappingsfile = global->getMappingsFile();       // mapping file的路径
 
-    // landmarkMapper
-    core::LandmarkMapper landmark_mapper =
-            mappingsfile.size()==0 ?
-                core::LandmarkMapper()
-              : core::LandmarkMapper(mappingsfile.toStdString());
+    // 重复使用时，不去新读取参数文件，保存在类中
+//    QString mappingsfile = global->getMappingsFile();       // mapping file的路径
 
-    // 输出的图片 - 在图片上标出特征点
-    Mat outimg = image.clone();
+//    // landmarkMapper
+//    core::LandmarkMapper landmark_mapper =
+//            mappingsfile.size()==0 ?
+//                core::LandmarkMapper()
+//              : core::LandmarkMapper(mappingsfile.toStdString());
 
-    int i = 1;
-    for (auto&& lm : (*landmarks))
-    {
-        cv::Point numPoint(
-                    lm.coordinates[0] - 2.0f,
-                    lm.coordinates[1] - 2.0f);
+//    // 输出的图片 - 在图片上标出特征点
+//    Mat outimg = image.clone();
 
-        cv::rectangle(
-                    outimg,
-                    cv::Point2f(lm.coordinates[0] - 2.0f, lm.coordinates[1] - 2.0f),
-                    cv::Point2f(lm.coordinates[0] + 2.0f, lm.coordinates[1] + 2.0f),
-                    { 255, 0, 0 });
-        /// Keegan.Ren
-        /// TODO: plot the face point and point number in the image
-        char str_i[11];
-        sprintf(str_i, "%d", i);
-        cv::putText(
-                    outimg,
-                    str_i,
-                    numPoint,
-                    CV_FONT_HERSHEY_COMPLEX,
-                    0.5,
-                    cv::Scalar(0, 0, 255));
-        ++i;
-    }
-    qDebug() << "i= " << i;
+//    int i = 1;
+//    for (auto&& lm : (*landmarks))
+//    {
+//        cv::Point numPoint(
+//                    lm.coordinates[0] - 2.0f,
+//                    lm.coordinates[1] - 2.0f);
 
-    this->outImage = this->cvMat2QImage(outimg);        // 将图片转换为 QImage
-    this->outImage.save(this->outputPath + "/" + "outImage.png");
+//        cv::rectangle(
+//                    outimg,
+//                    cv::Point2f(lm.coordinates[0] - 2.0f, lm.coordinates[1] - 2.0f),
+//                    cv::Point2f(lm.coordinates[0] + 2.0f, lm.coordinates[1] + 2.0f),
+//                    { 255, 0, 0 });
+//        /// Keegan.Ren
+//        /// TODO: plot the face point and point number in the image
+//        char str_i[11];
+//        sprintf(str_i, "%d", i);
+//        cv::putText(
+//                    outimg,
+//                    str_i,
+//                    numPoint,
+//                    CV_FONT_HERSHEY_COMPLEX,
+//                    0.5,
+//                    cv::Scalar(0, 0, 255));
+//        ++i;
+//    }
+
+//    cv::imshow("rect_outimg", outimg);
+//    cv::waitKey(1);
+
+//    cout << "image size:" << image.cols << " " << image.rows << endl;
+//    qDebug() << "i= " << i;
+
+//    this->outImage = this->cvMat2QImage(outimg);        // 将图片转换为 QImage
+//    this->outImage.save(this->outputPath + "/" + "outImage.png");
 
     // These will be the final 2D and 3D points used for the fitting:
-    std::vector<Vec4f> model_points; // the points in the 3D shape model
+    std::vector<cv::Vec4f> model_points; // the points in the 3D shape model
     std::vector<int> vertex_indices; // their vertex indices
-    std::vector<Vec2f> image_points; // the corresponding 2D landmark points
+    std::vector<cv::Vec2f> image_points; // the corresponding 2D landmark points
     // Sub-select all the landmarks which we have a mapping for (i.e. that are defined in the 3DMM):
 
     for (int i = 0; i < landmarks->size(); ++i)
     {
-        auto converted_name = landmark_mapper.convert((*landmarks)[i].name);
+        auto converted_name = landmark_mapper->convert((*landmarks)[i].name);
         if (!converted_name)
         {
             // no mapping defined for the current landmark
@@ -99,9 +146,9 @@ void FitModel::fitmodel(QImage qimage)
         }
 
         // 转换为int值
-//        int vertex_idx = std::stoi(converted_name.get());
-        int vertex_idx = QString::fromStdString(
-                    converted_name.get()).toInt();
+        int vertex_idx = std::stoi(converted_name.get());
+        //int vertex_idx = QString::fromStdString(
+        //            converted_name.get()).toInt();
 
         Vec4f vertex = morphable_model.get_shape_model().get_mean_at_point(vertex_idx);
         model_points.emplace_back(vertex);
@@ -183,11 +230,12 @@ void FitModel::fitmodel(QImage qimage)
                 affine_from_ortho,
                 image);
 
+    //cv::imshow("isomap_png", isomap);
+    //cv::waitKey(1);
+
     this->isoMap = this->cvMat2QImage(isomap);
 
     // Save the mesh as textured obj:
-//    outputfile += fs::path(".obj");
-//    render::write_textured_obj(mesh, outputfile.string());
     QString objPath = this->outputPath + "/" + this->fileName + ".obj";
     QString isoMapPath = this->outputPath + "/" + this->fileName + ".isomap.png";
 
@@ -198,13 +246,8 @@ void FitModel::fitmodel(QImage qimage)
                 mesh,
                 objPath.toStdString());
 
-//    cv::imwrite(
-//                isoMapPath.toStdString(),
-//                isomap);
     QImage qisomap = this->cvMat2QImage(isomap);
     qisomap.save(isoMapPath);
-
-
 }
 
 ///

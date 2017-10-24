@@ -37,6 +37,8 @@ private:
     QAction *action_fitmodel;               // 执行生成模型
     QAction *action_face_reconstruction;    // 直接执行完整程序-人脸重建
 
+    QString imagePath;
+
     // widget
     PicWidget *picWidget;
 
@@ -45,6 +47,7 @@ private slots:
     void setImage(QString filePath);        // 设置图片
     void faceDetection();                   // 执行人脸检测
     void faceReconsturction();              // 执行人脸重建
+    void testFitModel();                    // 基本使用源码
 };
 
 #endif // MAINWINDOW_H

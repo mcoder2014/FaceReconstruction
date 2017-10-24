@@ -74,6 +74,24 @@ HEADERS += \
     GUI/ModelViewer.h \
     GLOBAL_VAR.h \
     Face/FaceDetection.h \
+    eos/core/Landmark.hpp \
+    eos/core/LandmarkMapper.hpp \
+    eos/fitting/affine_camera_estimation.hpp \
+    eos/fitting/linear_shape_fitting.hpp \
+    eos/fitting/nonlinear_camera_estimation.hpp \
+    eos/fitting/detail/nonlinear_camera_estimation_detail.hpp \
+    eos/morphablemodel/MorphableModel.hpp \
+    eos/morphablemodel/PcaModel.hpp \
+    eos/morphablemodel/io/cvssp.hpp \
+    eos/morphablemodel/io/mat_cerealisation.hpp \
+    eos/render/Mesh.hpp \
+    eos/render/render.hpp \
+    eos/render/render_affine.hpp \
+    eos/render/texture_extraction.hpp \
+    eos/render/utils.hpp \
+    eos/render/detail/render_affine_detail.hpp \
+    eos/render/detail/render_detail.hpp \
+    eos/render/detail/texture_extraction_detail.hpp
 
 FORMS += \
     GUI/MainWindow.ui \

@@ -6,9 +6,26 @@
 #include <vector>
 #include <QColor>
 
+#define DLIB_PNG_SUPPORT
+#define DLIB_JPEG_SUPPORT
+
+using cv::Mat;
+using cv::Vec2f;
+using cv::Vec3f;
+using cv::Vec4f;
+
+FaceDetection *FaceDetection::m_instance = NULL;
+
 FaceDetection::FaceDetection()
 {
 
+    // And we also need a shape_predictor.  This is the tool that will predict face
+    // landmark positions given an image and face bounding box.  Here we are just
+    // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
+    // as a command line argument.
+    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
+
+    deserialize(global->getLandmarkDat().toStdString()) >> sp;
 }
 
 ///
@@ -17,19 +34,21 @@ FaceDetection::FaceDetection()
 /// \return
 /// 不显示图像，直接计算出标记的区域
 ///
+FaceDetection *FaceDetection::getInstance()
+{
+    if(m_instance == NULL)
+    {
+        m_instance = new FaceDetection();
+    }
+
+    return m_instance;
+}
+
 LandmarkCollection<cv::Vec2f> *FaceDetection::landmark(QString filePath)
 {
     // We need a face detector.  We will use this to get bounding boxes for
     // each face in an image.
     frontal_face_detector detector = get_frontal_face_detector();
-    // And we also need a shape_predictor.  This is the tool that will predict face
-    // landmark positions given an image and face bounding box.  Here we are just
-    // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
-    // as a command line argument.
-    shape_predictor sp;
-    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
-
-    deserialize(global->getLandmarkDat().toStdString()) >> sp;
 
     qDebug() << "shape_predictor init finished";
     qDebug() << "image path" << filePath;
@@ -65,12 +84,10 @@ LandmarkCollection<cv::Vec2f> *FaceDetection::landmark(QImage image)
     // landmark positions given an image and face bounding box.  Here we are just
     // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
     // as a command line argument.
-    shape_predictor sp;
-    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
+//    shape_predictor sp;
+//    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
 
-    deserialize(global->getLandmarkDat().toStdString()) >> sp;
-
-
+//    deserialize(global->getLandmarkDat().toStdString()) >> sp;
 
     // 加载图片-dlib直接load image函数出错，自己写了个转换
     array2d<rgb_pixel> *img = NULL;     // 图片
@@ -98,13 +115,16 @@ LandmarkCollection<cv::Vec2f> *FaceDetection::buildLandMarks(full_object_detecti
         landmark.coordinates[0] = pt_save.x();
         landmark.coordinates[1] = pt_save.y();
 
+        landmark.coordinates[0] -= 1;
+        landmark.coordinates[1] -= 1;
+
         qDebug() << "Point" << i+1
                  << " " << pt_save.x() << " " << pt_save.y();
 
         landmarks->emplace_back(landmark);
     }
 
-    qDebug() << landmarks->size();
+    qDebug() << "landmark.size" << landmarks->size();
 
     return landmarks;
 

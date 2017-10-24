@@ -22,37 +22,43 @@ using namespace eos;
 using eos::core::Landmark;
 using eos::core::LandmarkCollection;
 using cv::Mat;
-using cv::Vec2f;
-using cv::Vec3f;
-using cv::Vec4f;
-using std::cout;
-using std::endl;
-using std::vector;
-using std::string;
+namespace eos
+{
+namespace core
+{
+class LandmarkMapper;
+}
+}
+using eos::core::LandmarkMapper;
 
 class FitModel
 {
 public:
     FitModel();
-    void fitmodel(QImage image);
+
+    static FitModel *getInstance();
+    void fitmodel(QString image_path);          // 生成人脸模型
 
     QImage cvMat2QImage(const cv::Mat& mat);    // cvMat转换为QImage
     cv::Mat QImage2cvMat(QImage image);         // QImage 转化为cvMat
-
-    QImage getOutImage(){return this->outImage;}
-    QImage getIsoMap(){return this->isoMap;}
 
     QString getOutputPath(){return this->outputPath;}
     void setOutputPath(QString outPath){this->outputPath = outPath;}
     QString getFileName(){return this->fileName;}
     void setFileName(QString fileName){this->fileName = fileName;}
 
-private:
-    QImage outImage;
-    QImage isoMap;
+    QImage getIsoMap(){return this->isoMap;}
 
-    QString outputPath;
-    QString fileName;
+private:
+//    QImage outImage;                  // 标记上Mark点的图片
+    QImage isoMap;                      // 保存出的贴图
+
+    QString outputPath;                 // 输出文件夹路径
+    QString fileName;                   // 默认的文件名
+
+    LandmarkMapper *landmark_mapper;    //LandMark_mapper
+
+    static FitModel * m_instance;       // 单例模式
 };
 
 #endif // FITMODEL_H

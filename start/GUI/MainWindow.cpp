@@ -28,6 +28,8 @@ MainWindow::~MainWindow()
 ///
 void MainWindow::init()
 {
+    this->resize(800, 600);
+
     this->picWidget = NULL;
 
     // 初始化QAction
@@ -70,11 +72,17 @@ void MainWindow::initConnection()
     connect(this->action_addimage, SIGNAL(triggered(bool)),
             this, SLOT(openImage()));                       // 打开图片
 
+    connect(ui->selectImageButton, SIGNAL(pressed()),
+            this, SLOT(openImage()));                       // 打开图片按钮
+
     connect(this->action_landmark, SIGNAL(triggered(bool)),
             this, SLOT(faceDetection()));                   // 人脸检测
 
     connect(this->action_face_reconstruction, SIGNAL(triggered(bool)),
             this, SLOT(faceReconsturction()));
+
+    connect(this->action_fitmodel, SIGNAL(triggered(bool)),
+            this, SLOT(testFitModel()));
 }
 
 ///
@@ -95,6 +103,7 @@ void MainWindow::openImage()
 
         qDebug() << "selected image file:"
                  << path;
+        this->imagePath = path;         // 记录图片地址
         this->setImage(path);
     }
 }
@@ -126,8 +135,8 @@ void MainWindow::faceDetection()
     if(filePath.size() == 0)
          return;
 
-    FaceDetection detector;
-    detector.landmark(filePath);
+    FaceDetection *detector = FaceDetection::getInstance();
+    detector->landmark(filePath);
 }
 
 ///
@@ -144,7 +153,6 @@ void MainWindow::faceReconsturction()
     if(filePath.size() == 0)
          return;
 
-
     QFileDialog *fileDialog = new QFileDialog(this);
     fileDialog->setAcceptMode(QFileDialog::AcceptOpen);     // 打开文件模式
     fileDialog->setFileMode(QFileDialog::Directory);     // 显示存在的文件
@@ -160,7 +168,53 @@ void MainWindow::faceReconsturction()
         qDebug() << "selected directory: "
                  << dir.absolutePath();
 
-        fitmodel.fitmodel(this->picWidget->getImage());
+        fitmodel.fitmodel(this->imagePath);     // 执行生成模型
         qDebug() <<"fit model finished";
+    }
+}
+
+void MainWindow::testFitModel()
+{
+    FitModel fitmodel;                                      // 新建对象
+
+    if(this->picWidget == NULL)
+        return;
+    QString filePath = this->picWidget->getImagePath();
+    if(filePath.size() == 0)
+         return;
+
+
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setAcceptMode(QFileDialog::AcceptOpen);     // 打开文件模式
+    fileDialog->setFileMode(QFileDialog::ExistingFile);     // 显示存在的文件
+    fileDialog->setViewMode(QFileDialog::Detail);           // 显示详细模式
+    fileDialog->setNameFilter(tr("Image Files(*.jpg *.png)"));  // 过滤图片
+    fileDialog->setWindowTitle(tr("Choose one image file and open it"));    // 对话框标题
+
+    if(fileDialog->exec() == QDialog::Accepted)
+    {
+        QString path = fileDialog->selectedFiles()[0];      // 用户选择的文件名
+
+        qDebug() << "selected image file:"
+                 << path;
+        this->setImage(path);
+
+        fileDialog->setAcceptMode(QFileDialog::AcceptOpen);     // 打开文件模式
+        fileDialog->setFileMode(QFileDialog::Directory);     // 显示存在的文件
+        fileDialog->setViewMode(QFileDialog::Detail);           // 显示详细模式
+    //    fileDialog->setNameFilter(tr("Image Files(*.jpg *.png)"));  // 过滤图片
+        fileDialog->setWindowTitle(tr("Choose a floder to save model"));    // 对话框标题
+        fileDialog->setDirectory(fitmodel.getOutputPath());
+
+        if(fileDialog->exec() == QDialog::Accepted)
+        {
+            QDir dir = fileDialog->directory();
+            fitmodel.setOutputPath(dir.absolutePath());
+            qDebug() << "selected directory: "
+                     << dir.absolutePath();
+
+            fitmodel.fitmodel(path);
+            qDebug() <<"fit model finished";
+        }
     }
 }
