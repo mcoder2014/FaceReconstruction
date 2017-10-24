@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QString>
 #include <QDebug>
+#include <QMessageBox>
 #include "Face/FaceDetection.h"
 #include "Face/FitModel.h"
 
@@ -33,33 +34,56 @@ void MainWindow::init()
     this->picWidget = NULL;
 
     // 初始化QAction
+
+    // 打开图片
     this->action_addimage = new QAction(tr("open Image Files"));
     this->action_addimage->setStatusTip(tr("Select a image and open it"));
 
+    // 打开模型-等实现了三维场景后再做s
     this->action_addObjModel = new QAction(tr("open obj Files"));
     this->action_addObjModel->setStatusTip(tr("Select an obj file and open it"));
 
+    // landmark 作人脸标记s
     this->action_landmark = new QAction(tr("phase landmark"));
     this->action_landmark->setStatusTip(tr("landmark"));
 
+    // fit model
     this->action_fitmodel = new QAction(tr("phase fit model"));
     this->action_fitmodel->setStatusTip(tr("fit model"));
 
+    // face Reconstruction
     this->action_face_reconstruction = new QAction(tr("face reconstruction"));
     this->action_face_reconstruction->setStatusTip(tr("face reconstruction"));
 
+    // about qt
+    this->action_aboutQt = new QAction(tr("Qt"));
+    this->action_aboutQt->setStatusTip(tr("Tell you about qt"));
+
+    // about app
+    this->action_aboutApp = new QAction(tr("App"));
+    this->action_aboutApp->setStatusTip(tr("Tell you about this app"));
+
+    // menu
     this->menu_file = new QMenu(tr("Files"));
     this->menu_reconstruction = new QMenu(tr("Reconstruction"));
+    this->menu_about = new QMenu(tr("About"));
 
+    // file
     this->menu_file->addAction(this->action_addimage);
     this->menu_file->addAction(this->action_addObjModel);
 
+    // reconstruction
     this->menu_reconstruction->addAction(this->action_face_reconstruction);
     this->menu_reconstruction->addAction(this->action_landmark);
     this->menu_reconstruction->addAction(this->action_fitmodel);
 
+    // about
+    this->menu_about->addAction(this->action_aboutQt);
+    this->menu_about->addAction(this->action_aboutApp);
+
     ui->menuBar->addMenu(this->menu_file);
     ui->menuBar->addMenu(this->menu_reconstruction);
+    ui->menuBar->addMenu(this->menu_about);
 
     ui->mainToolBar->addAction(this->action_addimage);
     ui->mainToolBar->addAction(this->action_face_reconstruction);
@@ -83,6 +107,16 @@ void MainWindow::initConnection()
 
     connect(this->action_fitmodel, SIGNAL(triggered(bool)),
             this, SLOT(testFitModel()));
+
+    // 关于Qt
+    connect(this->action_aboutQt, SIGNAL(triggered(bool)),
+            this, SLOT(aboutQtBox()));
+
+    // 关于App
+    connect(this->action_aboutApp, SIGNAL(triggered(bool)),
+            this, SLOT(aboutAppBox()));
+
+
 }
 
 ///
@@ -217,4 +251,19 @@ void MainWindow::testFitModel()
             qDebug() <<"fit model finished";
         }
     }
+}
+
+void MainWindow::aboutQtBox()
+{
+    QMessageBox::aboutQt(
+                this,
+                tr("About Qt"));
+}
+
+void MainWindow::aboutAppBox()
+{
+    QMessageBox::about(
+                this,
+                tr("About Face Restruction"),
+                tr("There will put some words to Introduce this application."));
 }

@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>402</height>
+    <width>927</width>
+    <height>540</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -16,130 +22,200 @@
   <property name="locale">
    <locale language="Chinese" country="China"/>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="3">
-    <widget class="QPushButton" name="btn_zoomIn">
-     <property name="text">
-      <string>Zoom In</string>
+  <layout class="QGridLayout" name="gridLayout_3" columnstretch="1,6">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="spacing">
+      <number>6</number>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="4">
-    <widget class="QPushButton" name="btn_zoomOut">
-     <property name="text">
-      <string>Zoom Out</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="3" rowspan="3" colspan="2">
-    <widget class="QScrollArea" name="imageArea">
-     <property name="minimumSize">
-      <size>
-       <width>400</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="sizeAdjustPolicy">
-      <enum>QAbstractScrollArea::AdjustToContents</enum>
-     </property>
-     <property name="widgetResizable">
-      <bool>true</bool>
-     </property>
-     <widget class="QWidget" name="scrollAreaWidgetContents">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>398</width>
-        <height>356</height>
-       </rect>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+     <item row="0" column="0" colspan="2">
+      <widget class="QListWidget" name="ImageList">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>250</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>幼圆</family>
+         <pointsize>20</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
        <item>
-        <widget class="QLabel" name="picLabel">
-         <property name="minimumSize">
-          <size>
-           <width>300</width>
-           <height>300</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>加载中。。。</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
+        <property name="text">
+         <string>原图</string>
+        </property>
        </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="btn_changImage">
-     <property name="text">
-      <string>Change Image</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="btn_faceReconstruction">
-     <property name="text">
-      <string>Face Rconstruction</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="0" rowspan="3" colspan="2">
-    <widget class="QListWidget" name="ImageList">
-     <property name="minimumSize">
-      <size>
-       <width>200</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>250</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>幼圆</family>
-       <pointsize>20</pointsize>
-       <weight>50</weight>
-       <bold>false</bold>
-      </font>
-     </property>
-     <item>
-      <property name="text">
-       <string>原图</string>
-      </property>
+       <item>
+        <property name="text">
+         <string>人脸识别</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>人脸贴图</string>
+        </property>
+       </item>
+      </widget>
      </item>
-     <item>
-      <property name="text">
-       <string>人脸识别</string>
-      </property>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="btn_changImage">
+       <property name="maximumSize">
+        <size>
+         <width>125</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Change Image</string>
+       </property>
+      </widget>
      </item>
-     <item>
-      <property name="text">
-       <string>人脸贴图</string>
-      </property>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btn_faceReconstruction">
+       <property name="maximumSize">
+        <size>
+         <width>125</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Face Rconstruction</string>
+       </property>
+      </widget>
      </item>
-    </widget>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <layout class="QGridLayout" name="gridLayout_2">
+     <property name="horizontalSpacing">
+      <number>6</number>
+     </property>
+     <item row="0" column="0" colspan="2">
+      <widget class="QScrollArea" name="imageArea">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="cursor" stdset="0">
+        <cursorShape>SizeAllCursor</cursorShape>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::DefaultContextMenu</enum>
+       </property>
+       <property name="acceptDrops">
+        <bool>false</bool>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Box</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>2</number>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <property name="widgetResizable">
+        <bool>false</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>693</width>
+          <height>487</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::DefaultContextMenu</enum>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="picLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;加载中。。。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QPushButton" name="btn_zoomIn">
+       <property name="text">
+        <string>Zoom In</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QPushButton" name="btn_zoomOut">
+       <property name="text">
+        <string>Zoom Out</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

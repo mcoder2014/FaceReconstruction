@@ -27,6 +27,7 @@ private:
     // QMenu
     QMenu *menu_file;                       // 文件菜单
     QMenu *menu_reconstruction;             // 主菜单
+    QMenu *menu_about;                      // 关于菜单
 
     // QAction
     // 文件
@@ -36,6 +37,9 @@ private:
     QAction *action_landmark;               // 执行查找标记点
     QAction *action_fitmodel;               // 执行生成模型
     QAction *action_face_reconstruction;    // 直接执行完整程序-人脸重建
+
+    QAction *action_aboutQt;                // 关于Qt
+    QAction *action_aboutApp;               // 关于本APP
 
     QString imagePath;
 
@@ -48,6 +52,9 @@ private slots:
     void faceDetection();                   // 执行人脸检测
     void faceReconsturction();              // 执行人脸重建
     void testFitModel();                    // 基本使用源码
+
+    void aboutQtBox();                      // /关于Qt
+    void aboutAppBox();                     // 关于本App
 };
 
 #endif // MAINWINDOW_H
