@@ -54,6 +54,12 @@ p, li { white-space: pre-wrap; }
     </item>
     <item row="2" column="1">
      <widget class="QPushButton" name="selectImageButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+        <horstretch>200</horstretch>
+        <verstretch>30</verstretch>
+       </sizepolicy>
+      </property>
       <property name="font">
        <font>
         <family>幼圆</family>

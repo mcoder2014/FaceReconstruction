@@ -19,6 +19,7 @@ using cv::Vec4f;
 FaceDetection *FaceDetection::m_instance = NULL;
 
 FaceDetection::FaceDetection()
+    :QObject()
 {
 
     // And we also need a shape_predictor.  This is the tool that will predict face
@@ -148,9 +149,9 @@ QImage FaceDetection::drawLandMark(
     QPen pen;
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
-    brush.setColor(Qt::darkGreen);
+    brush.setColor(Qt::green);
     pen.setBrush(brush);
-    pen.setWidth(3);    // 线条粗细
+    pen.setWidth(5);    // 线条粗细
     painter.setPen(pen);
 
     for(int face = 0; face < marks->size(); face ++)
@@ -412,6 +413,44 @@ QImage FaceDetection::drawLandMark(
 
 
     return markedImage;
+}
+
+///
+/// \brief FaceDetection::thread_landmarkAllFace
+/// \param image
+///
+void FaceDetection::thread_landmarkAllFace(QImage image)
+{
+    // 建立容器
+    QVector<LandmarkCollection<cv::Vec2f> *> *vector =
+            new QVector<LandmarkCollection<cv::Vec2f> *>();
+
+    // 人脸检测器
+    frontal_face_detector detector = get_frontal_face_detector();
+
+    emit this->signals_progressValue(30);
+
+    array2d<rgb_pixel> *img = NULL;     // 加载图片
+    img = this->qimageToArray2d(image);
+
+    emit this->signals_progressValue(50);
+
+    std::vector<rectangle> dets = detector(*img);        // 检测人脸
+
+    emit this->signals_progressValue(70);
+
+    // 对每个检测到的人脸都做处理
+    for(int i = 0; i < dets.size(); i++)
+    {
+        full_object_detection shape = sp(*img, dets[i]);     // 检测
+        vector->push_back(
+                    this->buildLandMarks(shape));
+        emit this->signals_progressValue(70 + i * 30.0 / dets.size());
+    }
+
+    emit this->signals_progressValue(100);
+    emit this->signals_landmarkAll(vector);
+    emit this->signals_finished();
 }
 
 LandmarkCollection<cv::Vec2f> *FaceDetection::buildLandMarks(full_object_detection shape)

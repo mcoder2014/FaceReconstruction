@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QPainter>
+#include <QPen>
 #include "Face/FaceDetection.h"
 #include "Face/FitModel.h"
 
@@ -19,6 +21,7 @@ PicWidget::PicWidget(QWidget *parent) :
 
     this->init();               // 初始化
     this->initConnection();     // 初始化信号槽链接
+    this->initThread();
     this->process = none;
     this->markedPoints = NULL;
 }
@@ -164,24 +167,27 @@ void PicWidget::faceDetection()
 {
     Q_ASSERT(this->process != none);
 
-    QProgressDialog progress(
-                tr("Face Detection"),
+    QProgressDialog *progress = new QProgressDialog(
+                tr("Face Detection,Please press second list label until progress finished"),
                 tr("Abort Detected"),
                 0, 100,this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setValue(0);
-    progress.show();
-
 
     FaceDetection *detector = FaceDetection::getInstance();
-    progress.setValue(25);
-    this->markedPoints = detector->landmarkAllFace(this->image);
-    progress.setValue(60);
-    this->markedImage = detector->drawLandMark(
-                this->markedPoints,this->image);
-    progress.setValue(100);
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setValue(0);
+    progress->show();
 
-    this->process = detected;       // 修改阶段为到达检测完人脸的状态
+    qDebug() << thread_faceDetection.isRunning()
+             << thread_faceDetection.isFinished();
+
+    connect(detector, SIGNAL(signals_progressValue(int)),
+            progress, SLOT(setValue(int)));
+    connect(detector, SIGNAL(signals_finished()),
+            progress, SLOT(deleteLater()));
+
+//    detector->thread_landmarkAllFace(this->image);
+    emit this->signals_landmarkAllFace(this->image);
+    qDebug() << "Test if it is multi threads";
 }
 
 void PicWidget::faceReconstruction()
@@ -286,6 +292,294 @@ void PicWidget::imageRowSelectedRow(int index)
     qDebug() << "clicked id: " << index;
 }
 
+QImage PicWidget::drawLandMark(
+        QVector<LandmarkCollection<cv::Vec2f> *> *marks,
+        QImage &image)
+{
+    QImage markedImage(image);          // 复制一份
+    QPainter painter(&markedImage);    // 新建一个画笔
+
+    QPen pen;
+    QBrush brush;
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(Qt::green);
+    pen.setBrush(brush);
+    pen.setWidth(5);    // 线条粗细
+    painter.setPen(pen);
+
+    for(int face = 0; face < marks->size(); face ++)
+    {
+        // 依次处理每张脸
+        LandmarkCollection<cv::Vec2f> *landmarks = marks->operator [](face);
+
+        // 轮廓
+        QPainterPath border_path;
+        border_path.moveTo(
+                    (*landmarks)[0].coordinates[0],
+                (*landmarks)[0].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[1].coordinates[0],
+                (*landmarks)[1].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[2].coordinates[0],
+                (*landmarks)[2].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[3].coordinates[0],
+                (*landmarks)[3].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[4].coordinates[0],
+                (*landmarks)[4].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[5].coordinates[0],
+                (*landmarks)[5].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[6].coordinates[0],
+                (*landmarks)[6].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[7].coordinates[0],
+                (*landmarks)[7].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[8].coordinates[0],
+                (*landmarks)[8].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[9].coordinates[0],
+                (*landmarks)[9].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[10].coordinates[0],
+                (*landmarks)[10].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[11].coordinates[0],
+                (*landmarks)[11].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[12].coordinates[0],
+                (*landmarks)[12].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[13].coordinates[0],
+                (*landmarks)[13].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[14].coordinates[0],
+                (*landmarks)[15].coordinates[1]);
+        border_path.lineTo(
+                    (*landmarks)[16].coordinates[0],
+                (*landmarks)[16].coordinates[1]);
+
+        painter.drawPath(border_path);
+
+        // 右眉
+        QPainterPath rightEyeBrow;
+        rightEyeBrow.moveTo(
+                    (*landmarks)[17].coordinates[0],
+                (*landmarks)[17].coordinates[1]);
+        rightEyeBrow.lineTo(
+                    (*landmarks)[18].coordinates[0],
+                (*landmarks)[18].coordinates[1]);
+        rightEyeBrow.lineTo(
+                    (*landmarks)[19].coordinates[0],
+                (*landmarks)[19].coordinates[1]);
+        rightEyeBrow.lineTo(
+                    (*landmarks)[20].coordinates[0],
+                (*landmarks)[20].coordinates[1]);
+        rightEyeBrow.lineTo(
+                    (*landmarks)[21].coordinates[0],
+                (*landmarks)[21].coordinates[1]);
+
+        painter.drawPath(rightEyeBrow);
+
+        // 左眉
+        QPainterPath leftEyeBrow;
+        leftEyeBrow.moveTo(
+                    (*landmarks)[22].coordinates[0],
+                (*landmarks)[22].coordinates[1]);
+
+        leftEyeBrow.lineTo(
+                    (*landmarks)[23].coordinates[0],
+                (*landmarks)[23].coordinates[1]);
+        leftEyeBrow.lineTo(
+                    (*landmarks)[24].coordinates[0],
+                (*landmarks)[24].coordinates[1]);
+        leftEyeBrow.lineTo(
+                    (*landmarks)[25].coordinates[0],
+                (*landmarks)[25].coordinates[1]);
+        leftEyeBrow.lineTo(
+                    (*landmarks)[26].coordinates[0],
+                (*landmarks)[26].coordinates[1]);
+
+        painter.drawPath(leftEyeBrow);
+
+        // 鼻梁
+        QPainterPath brigeOfNose;
+        brigeOfNose.moveTo(
+                    (*landmarks)[27].coordinates[0],
+                (*landmarks)[27].coordinates[1]);
+        brigeOfNose.lineTo(
+                    (*landmarks)[28].coordinates[0],
+                (*landmarks)[28].coordinates[1]);
+        brigeOfNose.lineTo(
+                    (*landmarks)[29].coordinates[0],
+                (*landmarks)[29].coordinates[1]);
+        brigeOfNose.lineTo(
+                    (*landmarks)[30].coordinates[0],
+                (*landmarks)[30].coordinates[1]);
+
+        painter.drawPath(brigeOfNose);
+
+        // 鼻子
+        QPainterPath bottomOfNose;
+        bottomOfNose.moveTo(
+                    (*landmarks)[31].coordinates[0],
+                (*landmarks)[31].coordinates[1]);
+        bottomOfNose.lineTo(
+                    (*landmarks)[32].coordinates[0],
+                (*landmarks)[32].coordinates[1]);
+        bottomOfNose.lineTo(
+                    (*landmarks)[33].coordinates[0],
+                (*landmarks)[33].coordinates[1]);
+        bottomOfNose.lineTo(
+                    (*landmarks)[34].coordinates[0],
+                (*landmarks)[34].coordinates[1]);
+        bottomOfNose.lineTo(
+                    (*landmarks)[35].coordinates[0],
+                (*landmarks)[35].coordinates[1]);
+
+        //右眼
+        QPainterPath rightEye;
+        rightEye.moveTo(
+                    (*landmarks)[36].coordinates[0],
+                (*landmarks)[36].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[37].coordinates[0],
+                (*landmarks)[37].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[38].coordinates[0],
+                (*landmarks)[38].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[39].coordinates[0],
+                (*landmarks)[39].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[40].coordinates[0],
+                (*landmarks)[40].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[41].coordinates[0],
+                (*landmarks)[41].coordinates[1]);
+        rightEye.lineTo(
+                    (*landmarks)[36].coordinates[0],
+                (*landmarks)[36].coordinates[1]);
+        painter.drawPath(rightEye);
+
+        // 左眼
+        QPainterPath leftEye;
+        leftEye.moveTo(
+                    (*landmarks)[42].coordinates[0],
+                (*landmarks)[42].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[43].coordinates[0],
+                (*landmarks)[43].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[44].coordinates[0],
+                (*landmarks)[44].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[45].coordinates[0],
+                (*landmarks)[45].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[46].coordinates[0],
+                (*landmarks)[46].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[47].coordinates[0],
+                (*landmarks)[47].coordinates[1]);
+        leftEye.lineTo(
+                    (*landmarks)[42].coordinates[0],
+                (*landmarks)[42].coordinates[1]);
+        painter.drawPath(leftEye);
+
+        // 嘴巴
+        QPainterPath mouth;
+        mouth.moveTo(
+                    (*landmarks)[48].coordinates[0],
+                (*landmarks)[48].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[49].coordinates[0],
+                (*landmarks)[49].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[50].coordinates[0],
+                (*landmarks)[50].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[51].coordinates[0],
+                (*landmarks)[51].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[52].coordinates[0],
+                (*landmarks)[52].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[53].coordinates[0],
+                (*landmarks)[53].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[54].coordinates[0],
+                (*landmarks)[54].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[55].coordinates[0],
+                (*landmarks)[55].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[56].coordinates[0],
+                (*landmarks)[56].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[57].coordinates[0],
+                (*landmarks)[57].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[58].coordinates[0],
+                (*landmarks)[58].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[59].coordinates[0],
+                (*landmarks)[59].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[48].coordinates[0],
+                (*landmarks)[48].coordinates[1]);
+
+        mouth.moveTo(
+                    (*landmarks)[60].coordinates[0],
+                (*landmarks)[60].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[61].coordinates[0],
+                (*landmarks)[61].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[62].coordinates[0],
+                (*landmarks)[62].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[63].coordinates[0],
+                (*landmarks)[63].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[64].coordinates[0],
+                (*landmarks)[64].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[65].coordinates[0],
+                (*landmarks)[65].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[66].coordinates[0],
+                (*landmarks)[66].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[67].coordinates[0],
+                (*landmarks)[67].coordinates[1]);
+        mouth.lineTo(
+                    (*landmarks)[60].coordinates[0],
+                (*landmarks)[60].coordinates[1]);
+        painter.drawPath(mouth);
+
+    }
+
+
+    return markedImage;
+}
+
+void PicWidget::handle_landmarkAllFace(
+        QVector<LandmarkCollection<cv::Vec2f> *> *vector)
+{
+    Q_ASSERT(this->process != none);
+    this->markedPoints = vector;
+
+    this->markedImage = this->drawLandMark(
+                this->markedPoints,this->image);
+
+    this->process = detected;       // 修改阶段为到达检测完人脸的状态
+}
+
 ///
 /// \brief PicWidget::init
 ///
@@ -379,9 +673,25 @@ void PicWidget::initConnection()
     connect(ui->btn_faceDetection, SIGNAL(pressed()),
             this, SLOT(faceDetection()));
 
+}
 
+///
+/// \brief PicWidget::initThread
+///
+void PicWidget::initThread()
+{
+    FaceDetection *detector = FaceDetection::getInstance();
+    detector->moveToThread(&thread_faceDetection);
 
+    connect(this, SIGNAL(signals_landmarkAllFace(QImage)),
+            detector, SLOT(thread_landmarkAllFace(QImage)));
 
+    connect(detector,
+            SIGNAL(signals_landmarkAll(QVector<LandmarkCollection<cv::Vec2f>*>*)),
+            this,
+            SLOT(handle_landmarkAllFace(QVector<LandmarkCollection<cv::Vec2f>*>*)));
+
+    thread_faceDetection.start();
 }
 
 ///

@@ -7,6 +7,7 @@
 #include <QScrollBar>
 #include <QVector>
 #include <QListWidgetItem>
+#include <QThread>
 
 #include <eos/core/Landmark.hpp>
 #include <opencv2/core/core.hpp>
@@ -54,6 +55,9 @@ private:
     QImage isoImage;        // 变形后得到的模型的贴图
     double scaleFactor;     // 缩放比例
 
+    QThread thread_faceDetection;       // 人脸检测相关的线程
+    QThread thread_faceReconstruction;  // 人脸重建相关的线程
+
     PROCESS process;        // 处理到的流程
     QVector<LandmarkCollection<cv::Vec2f> *> *markedPoints;  // 人脸检测后的点
 
@@ -72,13 +76,26 @@ private:
 
     void init();            // 初始化一些东西
     void initConnection();  // 初始化链接
+    void initThread();      // 结合多线程做一些初始化
 
 private slots:
     void showContextMenu(const QPoint &pos);
     void scaleImage(double factor);             // 缩放图片
     void setScaleFactor(double scaleFactor);    // 直接设置图片显示为百分之多少
     void adjustScrollBar(QScrollBar *scrollBar, double factor);     // 调整进度条
-    void imageRowSelectedRow(int index);        // 点击查看其它图片
+    void imageRowSelectedRow(int index);        // 点击查看其它类别的图片
+    QImage drawLandMark(
+            QVector<LandmarkCollection<cv::Vec2f> *> * marks,
+            QImage& image);     // 结合计算出的结果，在图片上标出人脸
+
+    void handle_landmarkAllFace(QVector<LandmarkCollection<cv::Vec2f> *> * vector);
+
+
+signals:
+    void signals_landmarkAllFace(QImage image);     // 标记人脸mark点
+
+
+
 };
 
 #endif // PICWIDGET_H
