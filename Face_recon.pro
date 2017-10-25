@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    start
+    start  \
 
 CONFIG += ordered warn_on qt

@@ -31,13 +31,15 @@ void MainWindow::init()
 {
     this->resize(800, 600);
 
-    this->picWidget = NULL;
+    this->picWidget = new PicWidget(this);
+    this->picWidget->setVisible(false);
 
     // 初始化QAction
 
     // 打开图片
     this->action_addimage = new QAction(tr("open Image Files"));
     this->action_addimage->setStatusTip(tr("Select a image and open it"));
+    this->action_addimage->setIcon(QIcon(":/img/sources/iconImg.png"));
 
     // 打开模型-等实现了三维场景后再做s
     this->action_addObjModel = new QAction(tr("open obj Files"));
@@ -54,6 +56,8 @@ void MainWindow::init()
     // face Reconstruction
     this->action_face_reconstruction = new QAction(tr("face reconstruction"));
     this->action_face_reconstruction->setStatusTip(tr("face reconstruction"));
+    this->action_face_reconstruction->setIcon(
+                QIcon(":/img/sources/reconstruction.png"));
 
     // about qt
     this->action_aboutQt = new QAction(tr("Qt"));
@@ -154,6 +158,7 @@ void MainWindow::setImage(QString filePath)
     }
 
     this->setCentralWidget(this->picWidget);
+    this->picWidget->setVisible(true);
     this->picWidget->setImagePath(filePath);
 
 }

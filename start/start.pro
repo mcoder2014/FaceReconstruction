@@ -27,10 +27,10 @@ MOC_DIR = ../moc        # Q_OBJECT转换后的类
 RCC_DIR = ../rcc        # .qrc文件转换后的位置
 OBJECTS_DIR = ../tmp    # 编译中间文件的位置
 
-INCLUDEPATH += E:/openCV-2.4.11/build/install/include \
+INCLUDEPATH += $$PWD \
+               E:/openCV-2.4.11/build/install/include \
                E:/boost1.50/boost_1_50_0 \
                $$PWD/../libs \
-               $$PWD \
                $$PWD/../libs/eigen-eigen-b9cd8366d4e8
 
 LIBS += -L$$PWD/../libs -ldlib \
@@ -97,3 +97,8 @@ FORMS += \
     GUI/MainWindow.ui \
     GUI/PicWidget.ui \
     GUI/ModelViewer.ui
+
+RESOURCES += \
+    resource.qrc
+
+TRANSLATIONS = cn_start.ts

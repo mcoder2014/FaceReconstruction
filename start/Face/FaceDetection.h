@@ -13,6 +13,7 @@
 
 #include <QString>
 #include <QImage>
+#include <QVector>
 
 using namespace dlib;
 using namespace std;
@@ -28,8 +29,13 @@ class FaceDetection
 {
 public:
     static FaceDetection *getInstance();
-    LandmarkCollection<cv::Vec2f> *landmark(QString filePath);
-    LandmarkCollection<cv::Vec2f> *landmark(QImage image);
+    LandmarkCollection<cv::Vec2f> *landmark(QString filePath);          // 标记landMark-第一张人脸
+    LandmarkCollection<cv::Vec2f> *landmark(QImage image);              // 标记landMark-第一张人脸
+    QVector<LandmarkCollection<cv::Vec2f> *> *landmarkAllFace(QImage image);    // 标记landMark-所有人脸
+
+    QImage drawLandMark(
+            QVector<LandmarkCollection<cv::Vec2f> *> * marks,
+            QImage& image);     // 结合计算出的结果，在图片上标出人脸
 
 private:
     static FaceDetection* m_instance;
