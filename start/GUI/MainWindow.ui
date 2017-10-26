@@ -63,13 +63,19 @@ p, li { white-space: pre-wrap; }
       <property name="font">
        <font>
         <family>幼圆</family>
-        <pointsize>28</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <pointsize>36</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
+      </property>
+      <property name="statusTip">
+       <string extracomment="选择一个图片，打开"/>
       </property>
       <property name="text">
        <string>Select one image to open</string>
+      </property>
+      <property name="shortcut">
+       <string/>
       </property>
       <property name="autoDefault">
        <bool>false</bool>

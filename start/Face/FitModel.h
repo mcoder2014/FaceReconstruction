@@ -32,9 +32,10 @@ class LandmarkMapper;
 using eos::core::LandmarkMapper;
 
 class FitModel
+        :public QObject
 {
+    Q_OBJECT
 public:
-    FitModel();
 
     static FitModel *getInstance();
     void fitmodel(QString image_path);          // 生成人脸模型
@@ -49,7 +50,12 @@ public:
 
     QImage getIsoMap(){return this->isoMap;}
 
+public slots:
+    void thread_fitModel(QString image_path,
+            LandmarkCollection<cv::Vec2f>* landmarks);  // fitModel
+
 private:
+    FitModel();
 //    QImage outImage;                  // 标记上Mark点的图片
     QImage isoMap;                      // 保存出的贴图
 
@@ -59,6 +65,12 @@ private:
     LandmarkMapper *landmark_mapper;    //LandMark_mapper
 
     static FitModel * m_instance;       // 单例模式
+
+signals:
+    void signals_isoMap(QImage isoMap);             // 完成IsoMap
+    void signals_msg(QString title, QString msg);   // 输出消息
+    void signals_finished();                        // 完成
+    void signals_progressValue(int value);          // 进度信息
 };
 
 #endif // FITMODEL_H

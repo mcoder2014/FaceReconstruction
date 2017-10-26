@@ -39,6 +39,7 @@ public:
             QImage& image);     // 结合计算出的结果，在图片上标出人脸
 public slots:
     void thread_landmarkAllFace(QImage image);
+    void thread_init();                // 希望在多线程里初始化？
 
 private:
     static FaceDetection* m_instance;
@@ -53,6 +54,7 @@ signals:
     void signals_landmarkAll(QVector<LandmarkCollection<cv::Vec2f> *> *vector);
     void signals_finished();                // 计算完成
     void signals_progressValue(int value);  // 更新进度条
+    void signals_msg(QString title,QString msg);
 };
 
 #endif // FaceDetection_H

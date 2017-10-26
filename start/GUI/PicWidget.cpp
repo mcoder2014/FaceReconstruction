@@ -29,6 +29,8 @@ PicWidget::PicWidget(QWidget *parent) :
 PicWidget::~PicWidget()
 {
     delete ui;
+    this->thread_face.quit();
+    this->thread_face.wait();
 }
 
 ///
@@ -81,7 +83,7 @@ void PicWidget::selectImage()
 
         qDebug() << "select image: " << path;
 
-        this->imagePath = path;         // 记录图片路径
+//        this->imagePath = path;         // 记录图片路径
         this->setImagePath(path);       // 打开图片
     }
 }
@@ -165,7 +167,15 @@ void PicWidget::setLisetSelection(int index)
 ///
 void PicWidget::faceDetection()
 {
-    Q_ASSERT(this->process != none);
+//    Q_ASSERT(this->process != none);
+    if(this->process == none)
+    {
+        QMessageBox::warning(
+                    this,
+                    tr("Warning"),
+                    tr("Please load image first!"));
+        return;
+    }
 
     QProgressDialog *progress = new QProgressDialog(
                 tr("Face Detection,Please press second list label until progress finished"),
@@ -174,32 +184,115 @@ void PicWidget::faceDetection()
 
     FaceDetection *detector = FaceDetection::getInstance();
     progress->setWindowModality(Qt::WindowModal);
+    progress->setWindowTitle(tr("Message"));
     progress->setValue(0);
     progress->show();
 
-    qDebug() << thread_faceDetection.isRunning()
-             << thread_faceDetection.isFinished();
+    qDebug() << thread_face.isRunning()
+             << thread_face.isFinished();
 
     connect(detector, SIGNAL(signals_progressValue(int)),
             progress, SLOT(setValue(int)));
     connect(detector, SIGNAL(signals_finished()),
             progress, SLOT(deleteLater()));
 
-//    detector->thread_landmarkAllFace(this->image);
     emit this->signals_landmarkAllFace(this->image);
-    qDebug() << "Test if it is multi threads";
 }
 
+///
+/// \brief PicWidget::faceReconstruction
+///
 void PicWidget::faceReconstruction()
 {
-    Q_ASSERT(this->process != none);
-    Q_ASSERT(this->process != loadedImage);
+    if(this->process == none)
+    {
+        QMessageBox::warning(
+                    this,
+                    tr("Warning"),
+                    tr("Please load image first!"));
+        return;
+    }
+    else if(this->process == loadedImage)
+    {
+        QMessageBox::warning(
+                    this,
+                    tr("Warning"),
+                    tr("Please execute face detection first!"));
+        return;
+    }
+
+    FitModel *fitmodel = FitModel::getInstance();           // 获得对象
+    QFileDialog *fileDialog = new QFileDialog(this);
+    fileDialog->setAcceptMode(QFileDialog::AcceptOpen);     // 打开文件模式
+    fileDialog->setFileMode(QFileDialog::AnyFile);        // 显示路径
+    fileDialog->setViewMode(QFileDialog::Detail);           // 显示详细模式
+//    fileDialog->setNameFilter(tr("Image Files(*.jpg *.png)"));  // 过滤图片
+    fileDialog->setWindowTitle(tr("Choose a floder to save model"));    // 对话框标题
+    fileDialog->setDirectory(fitmodel->getOutputPath());
+    fileDialog->selectFile(fitmodel->getFileName());
+
+    if(fileDialog->exec() == QDialog::Accepted)
+    {
+        QDir dir = fileDialog->directory();
+        fitmodel->setOutputPath(dir.absolutePath());    // 设置保存路径
+        qDebug() << "selected directory: "
+                 << dir.absolutePath()
+                 << "selected files:"
+                 << fileDialog->selectedFiles()[0];
+        qDebug() <<"fit model finished";
+    }
+
+    faceReconstruction(0);
 }
 
+///
+/// \brief PicWidget::faceReconstruction
+/// \param i
+///
 void PicWidget::faceReconstruction(int i)
 {
     Q_ASSERT(this->process != none);
     Q_ASSERT(this->process != loadedImage);
+
+    if(i >= this->markedPoints->size() || i < 0)
+    {
+        qDebug() << "the request face is out of range";
+        return;
+    }
+    LandmarkCollection<cv::Vec2f>* landmarks = this->markedPoints->operator [](i);
+
+    QProgressDialog *progress = new QProgressDialog(
+                tr("Face Reconstruction,Please press third list label until progress finished"),
+                tr("Abort Reconstruction"),
+                0, 100,this);
+
+    FitModel *fitmodel = FitModel::getInstance();
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setWindowTitle(tr("Message"));
+    progress->setValue(0);
+    progress->show();
+
+    qDebug() << thread_face.isRunning()
+             << thread_face.isFinished();
+
+    connect(fitmodel, SIGNAL(signals_progressValue(int)),
+            progress, SLOT(setValue(int)));
+    connect(fitmodel, SIGNAL(signals_finished()),
+            progress, SLOT(deleteLater()));
+
+
+    emit this->signals_fitModel(
+                this->imagePath,
+                landmarks);
+
+}
+
+void PicWidget::showMessage(QString title, QString msg)
+{
+    QMessageBox::information(
+                this,
+                title,
+                msg);
 }
 
 ///
@@ -288,7 +381,7 @@ void PicWidget::imageRowSelectedRow(int index)
         }
     }
 
-    this->setScaleFactor(this->scaleFactor);
+    this->setScaleFactor(scaleFactor);
     qDebug() << "clicked id: " << index;
 }
 
@@ -532,7 +625,6 @@ QImage PicWidget::drawLandMark(
         mouth.lineTo(
                     (*landmarks)[48].coordinates[0],
                 (*landmarks)[48].coordinates[1]);
-
         mouth.moveTo(
                     (*landmarks)[60].coordinates[0],
                 (*landmarks)[60].coordinates[1]);
@@ -564,7 +656,6 @@ QImage PicWidget::drawLandMark(
 
     }
 
-
     return markedImage;
 }
 
@@ -577,7 +668,31 @@ void PicWidget::handle_landmarkAllFace(
     this->markedImage = this->drawLandMark(
                 this->markedPoints,this->image);
 
-    this->process = detected;       // 修改阶段为到达检测完人脸的状态
+    if(this->markedPoints->size() == 0)
+    {
+        QMessageBox::warning(
+                    this,
+                    tr("Warning!"),
+                    tr("Program has not detected a face, please change a image"));
+
+    }
+    else
+    {
+        this->process = detected;       // 修改阶段为到达检测完人脸的状态
+        this->imageRowSelectedRow(1);
+    }
+
+}
+
+///
+/// \brief PicWidget::handle_fitModelIsoMap
+/// \param image
+///
+void PicWidget::handle_fitModelIsoMap(QImage image)
+{
+    this->isoImage = image;
+    this->process = reconstruction;
+    this->imageRowSelectedRow(2);
 }
 
 ///
@@ -673,6 +788,10 @@ void PicWidget::initConnection()
     connect(ui->btn_faceDetection, SIGNAL(pressed()),
             this, SLOT(faceDetection()));
 
+    // faceReconstruction
+    connect(ui->btn_faceReconstruction, SIGNAL(pressed()),
+            this, SLOT(faceReconstruction()));
+
 }
 
 ///
@@ -680,18 +799,47 @@ void PicWidget::initConnection()
 ///
 void PicWidget::initThread()
 {
+    // 将人脸检测类塞入分线程
     FaceDetection *detector = FaceDetection::getInstance();
-    detector->moveToThread(&thread_faceDetection);
+    detector->moveToThread(&thread_face);
 
+    // 传入参数->人脸识别
     connect(this, SIGNAL(signals_landmarkAllFace(QImage)),
             detector, SLOT(thread_landmarkAllFace(QImage)));
 
+    // 传出参数->人脸识别结束
     connect(detector,
             SIGNAL(signals_landmarkAll(QVector<LandmarkCollection<cv::Vec2f>*>*)),
             this,
             SLOT(handle_landmarkAllFace(QVector<LandmarkCollection<cv::Vec2f>*>*)));
 
-    thread_faceDetection.start();
+    // 显示信息
+    connect(detector,SIGNAL(signals_msg(QString, QString)),
+            this, SLOT(showMessage(QString, QString)));
+
+    // 利用多线程初始化
+    connect(this, SIGNAL(signals_initFaceDetection()),
+            detector, SLOT(thread_init()));
+    emit this->signals_initFaceDetection();
+
+    // 将fitmodel塞入分线程
+    FitModel *fitModel = FitModel::getInstance();
+
+    // 链接-执行操作
+    connect(this,
+            SIGNAL(signals_fitModel(QString,LandmarkCollection<cv::Vec2f>*)),
+            fitModel,
+            SLOT(thread_fitModel(QString,LandmarkCollection<cv::Vec2f>*)));
+
+    // 返回参数-人脸贴图
+    connect(fitModel, SIGNAL(signals_isoMap(QImage)),
+            this, SLOT(handle_fitModelIsoMap(QImage)));
+
+    // 显示消息
+    connect(fitModel, SIGNAL(signals_msg(QString,QString)),
+            this, SLOT(showMessage(QString,QString)));
+
+    thread_face.start();
 }
 
 ///

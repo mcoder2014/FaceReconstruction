@@ -46,6 +46,7 @@ public slots:
     void faceDetection();           // 执行人脸检测
     void faceReconstruction();      // 重建第一个用户
     void faceReconstruction(int i); // 重建第i个用户
+    void showMessage(QString title, QString msg);  // 接收从多线程传来的消息，用QmessageBox显示
 
 private:
     Ui::PicWidget *ui;
@@ -55,8 +56,8 @@ private:
     QImage isoImage;        // 变形后得到的模型的贴图
     double scaleFactor;     // 缩放比例
 
-    QThread thread_faceDetection;       // 人脸检测相关的线程
-    QThread thread_faceReconstruction;  // 人脸重建相关的线程
+    QThread thread_face;       // 人脸检测相关的线程
+//    QThread thread_faceReconstruction;  // 人脸重建相关的线程
 
     PROCESS process;        // 处理到的流程
     QVector<LandmarkCollection<cv::Vec2f> *> *markedPoints;  // 人脸检测后的点
@@ -89,11 +90,13 @@ private slots:
             QImage& image);     // 结合计算出的结果，在图片上标出人脸
 
     void handle_landmarkAllFace(QVector<LandmarkCollection<cv::Vec2f> *> * vector);
-
+    void handle_fitModelIsoMap(QImage image);       // 接收人脸贴图
 
 signals:
     void signals_landmarkAllFace(QImage image);     // 标记人脸mark点
-
+    void signals_initFaceDetection();               // 因为FaceDetection初始化耗时严重
+    void signals_fitModel(QString image_path,
+                          LandmarkCollection<cv::Vec2f>* marks);    // 构建模型
 
 
 };

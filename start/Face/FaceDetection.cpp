@@ -26,9 +26,8 @@ FaceDetection::FaceDetection()
     // landmark positions given an image and face bounding box.  Here we are just
     // loading the model from the shape_predictor_68_face_landmarks.dat file you gave
     // as a command line argument.
-    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
-
-    deserialize(global->getLandmarkDat().toStdString()) >> sp;
+//    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
+//    deserialize(global->getLandmarkDat().toStdString()) >> sp;
 }
 
 ///
@@ -452,6 +451,17 @@ void FaceDetection::thread_landmarkAllFace(QImage image)
     emit this->signals_landmarkAll(vector);
     emit this->signals_finished();
 }
+
+void FaceDetection::thread_init()
+{
+    GLOBAL_VAR* global = GLOBAL_VAR::getInstance();
+    deserialize(global->getLandmarkDat().toStdString()) >> sp;
+
+//    emit this->signals_msg(
+//                tr("FaceDetection Finished"),
+//                tr("FaceDetection finished"));
+}
+
 
 LandmarkCollection<cv::Vec2f> *FaceDetection::buildLandMarks(full_object_detection shape)
 {
