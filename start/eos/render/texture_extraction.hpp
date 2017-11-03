@@ -157,11 +157,11 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			const Vec4f v1 = Mat(affine_camera_matrix * Mat(mesh.vertices[triangle_indices[1]]));
 			const Vec4f v2 = Mat(affine_camera_matrix * Mat(mesh.vertices[triangle_indices[2]]));
 
-			if (!detail::is_triangle_visible(v0, v1, v2, depthbuffer))
-			{
-				//continue;
-				return;
-			}
+            if (!detail::is_triangle_visible(v0, v1, v2, depthbuffer))
+            {
+                //continue;
+                return;
+            }
 
 			float alpha_value;
 			if (compute_view_angle)
@@ -186,11 +186,12 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 				//  *  0 means  90?				//  * -1 means 180?(facing opposite directions)
 				// It's a linear relation, so +0.5 is 45?etc.
 				// An angle larger than 90?means the vertex won't be rendered anyway (because it's back-facing) so we encode 0?to 90?
-				if (angle < 0.0f) {
-					alpha_value = 0.0f;
-				} else {
-					alpha_value = angle * 255.0f;
-				}
+                if (angle < 0.0f) {
+                    alpha_value = 0.0f;
+                } else {
+                    alpha_value = angle * 255.0f;
+                }
+//                alpha_value = 255.0f;
 			}
 			else {
 				// no visibility angle computation - if the triangle/pixel is visible, set the alpha chan to 255 (fully visible pixel).
@@ -213,9 +214,9 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			res = Mat(affine_camera_matrix * Mat(vec));
 			src_tri[2] = Vec2f(res[0], res[1]);
 
-			dst_tri[0] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[0]][0], isomap.rows*mesh.texcoords[triangle_indices[0]][1] - 1.0f);
-			dst_tri[1] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[1]][0], isomap.rows*mesh.texcoords[triangle_indices[1]][1] - 1.0f);
-			dst_tri[2] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[2]][0], isomap.rows*mesh.texcoords[triangle_indices[2]][1] - 1.0f);
+            dst_tri[0] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[0]][0], isomap.rows*mesh.texcoords[triangle_indices[0]][1] - 1.0f);
+            dst_tri[1] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[1]][0], isomap.rows*mesh.texcoords[triangle_indices[1]][1] - 1.0f);
+            dst_tri[2] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[2]][0], isomap.rows*mesh.texcoords[triangle_indices[2]][1] - 1.0f);
 
 			// Get the inverse Affine Transform from original image: from dst to src
 			Mat warp_mat_org_inv = cv::getAffineTransform(dst_tri, src_tri);
@@ -250,7 +251,8 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 							{
 								for (int b = ceil(min_b); b <= floor(max_b); ++b)
 								{
-									if (detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_upper_left, src_texel_lower_left, src_texel_upper_right) || detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_lower_left, src_texel_upper_right, src_texel_lower_right)) {
+                                    if (detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_upper_left, src_texel_lower_left, src_texel_upper_right)
+                                            || detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_lower_left, src_texel_upper_right, src_texel_lower_right)) {
 										if (a < image.cols && b < image.rows) { // if src_texel in triangle and in image
 											num_texels++;
 											color += image.at<Vec3b>(b, a);
@@ -314,7 +316,7 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 								isomap.at<cv::Vec4b>(y, x)[0] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[0];
 								isomap.at<cv::Vec4b>(y, x)[1] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[1];
 								isomap.at<cv::Vec4b>(y, x)[2] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[2];
-								isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
+                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
 							}
 						}
 					}

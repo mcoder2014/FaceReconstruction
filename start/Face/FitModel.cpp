@@ -310,7 +310,7 @@ void FitModel::thread_fitModel(
     // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
     Mat image = cv::imread(image_path.toStdString());
 
-    emit this->signals_progressValue(15);               // 进度条信息
+    emit this->signals_progressValue(5);               // 进度条信息
 
     GLOBAL_VAR *global = GLOBAL_VAR::getInstance();         // 全局变量
 
@@ -327,7 +327,7 @@ void FitModel::thread_fitModel(
         return;
     }
 
-    emit this->signals_progressValue(35);               // 进度条信息
+    emit this->signals_progressValue(15);               // 进度条信息
     // These will be the final 2D and 3D points used for the fitting:
     std::vector<cv::Vec4f> model_points; // the points in the 3D shape model
     std::vector<int> vertex_indices; // their vertex indices
@@ -351,7 +351,7 @@ void FitModel::thread_fitModel(
         image_points.emplace_back((*landmarks)[i].coordinates);
     }
 
-    emit this->signals_progressValue(50);               // 进度条信息
+    emit this->signals_progressValue(30);               // 进度条信息
 
     // Estimate the camera (pose) from the 2D - 3D point correspondences
     fitting::OrthographicRenderingParameters rendering_params
@@ -361,7 +361,7 @@ void FitModel::thread_fitModel(
                 image.cols,
                 image.rows);
 
-    emit this->signals_progressValue(65);               // 进度条信息
+    emit this->signals_progressValue(40);               // 进度条信息
 
     /// Keegan.Ren
     std::cout << "rendering_params = ";
@@ -391,7 +391,7 @@ void FitModel::thread_fitModel(
                 image_points,
                 vertex_indices);
 
-    emit this->signals_progressValue(75);               // 进度条信息
+    emit this->signals_progressValue(60);               // 进度条信息
 
     // Keegan
     cout << "affine_from_ortho = " << endl;
@@ -410,14 +410,14 @@ void FitModel::thread_fitModel(
     for (int i = 0; i < fitted_coeffs.size(); ++i)
         cout << fitted_coeffs[i] << endl;
 
-    emit this->signals_progressValue(80);               // 进度条信息
+    emit this->signals_progressValue(70);               // 进度条信息
 
     // Obtain the full mesh with the estimated coefficients:
     render::Mesh mesh = morphable_model.draw_sample(
                 fitted_coeffs,
                 std::vector<float>());
 
-    emit this->signals_progressValue(85);               // 进度条信息
+    emit this->signals_progressValue(75);               // 进度条信息
 
     // Extract the texture from the image using given mesh and camera parameters:
     Mat isomap = render::extract_texture(
@@ -425,7 +425,7 @@ void FitModel::thread_fitModel(
                 affine_from_ortho,
                 image);
 
-    emit this->signals_progressValue(95);               // 进度条信息
+    emit this->signals_progressValue(85);               // 进度条信息
 
     this->isoMap = this->cvMat2QImage(isomap);
 
@@ -439,11 +439,14 @@ void FitModel::thread_fitModel(
     render::write_textured_obj(
                 mesh,
                 objPath.toStdString());
-    emit this->signals_progressValue(98);               // 进度条信息
-
+    emit this->signals_progressValue(90);               // 进度条信息
     QImage qisomap = this->cvMat2QImage(isomap);
-    emit this->signals_isoMap(qisomap);
+    qisomap.save(isoMapPath);
+
+//    emit this->signals_isoMap(qisomap);
+    emit this->signals_outPath(this->outputPath, this->fileName + ".obj", this->fileName + ".isomap.png");
     emit this->signals_progressValue(100);               // 进度条信息
     emit this->signals_finished();
-    qisomap.save(isoMapPath);
+
+
 }

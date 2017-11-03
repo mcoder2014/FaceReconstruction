@@ -6,7 +6,7 @@
     <message>
         <location filename="GUI/MainWindow.ui" line="20"/>
         <source>MainWindow</source>
-        <translation>但张照片的人脸重建</translation>
+        <translation>单张照片人脸重建</translation>
     </message>
     <message>
         <location filename="GUI/MainWindow.ui" line="40"/>
@@ -22,7 +22,7 @@ p, li { white-space: pre-wrap; }
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.ui" line="66"/>
+        <location filename="GUI/MainWindow.ui" line="75"/>
         <source>Select one image to open</source>
         <translation>打开一张人脸正面照片</translation>
     </message>
@@ -108,37 +108,37 @@ p, li { white-space: pre-wrap; }
         <translation>关于</translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="135"/>
-        <location filename="GUI/MainWindow.cpp" line="230"/>
+        <location filename="GUI/MainWindow.cpp" line="141"/>
+        <location filename="GUI/MainWindow.cpp" line="235"/>
         <source>Image Files(*.jpg *.png)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="136"/>
-        <location filename="GUI/MainWindow.cpp" line="231"/>
+        <location filename="GUI/MainWindow.cpp" line="142"/>
+        <location filename="GUI/MainWindow.cpp" line="236"/>
         <source>Choose one image file and open it</source>
         <translation>选择一张图片打开</translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="200"/>
-        <location filename="GUI/MainWindow.cpp" line="245"/>
+        <location filename="GUI/MainWindow.cpp" line="206"/>
+        <location filename="GUI/MainWindow.cpp" line="250"/>
         <source>Choose a floder to save model</source>
         <translation>选择轮径保存模型</translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="265"/>
+        <location filename="GUI/MainWindow.cpp" line="270"/>
         <source>About Qt</source>
         <translation>关于Qt</translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="272"/>
+        <location filename="GUI/MainWindow.cpp" line="277"/>
         <source>About Face Restruction</source>
         <translation>关于人脸重建</translation>
     </message>
     <message>
-        <location filename="GUI/MainWindow.cpp" line="273"/>
+        <location filename="GUI/MainWindow.cpp" line="278"/>
         <source>There will put some words to Introduce this application.</source>
-        <translation>这里会放置一些关于本程序的介绍</translation>
+        <translation>这里会放置一些关于本程序的介绍。</translation>
     </message>
 </context>
 <context>
@@ -173,9 +173,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location filename="GUI/PicWidget.ui" line="95"/>
-        <location filename="GUI/PicWidget.cpp" line="168"/>
         <source>Face Detection</source>
-        <translation>人脸检测</translation>
+        <translation>人脸识别</translation>
     </message>
     <message>
         <location filename="GUI/PicWidget.ui" line="108"/>
@@ -188,69 +187,127 @@ p, li { white-space: pre-wrap; }
         <translation>人脸重建</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.ui" line="203"/>
+        <location filename="GUI/PicWidget.ui" line="217"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;加载中。。。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.ui" line="223"/>
-        <location filename="GUI/PicWidget.cpp" line="299"/>
+        <location filename="GUI/PicWidget.ui" line="122"/>
+        <location filename="GUI/PicWidget.cpp" line="741"/>
         <source>Zoom In</source>
         <translation>放大</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.ui" line="230"/>
-        <location filename="GUI/PicWidget.cpp" line="300"/>
+        <location filename="GUI/PicWidget.ui" line="129"/>
+        <location filename="GUI/PicWidget.cpp" line="742"/>
         <source>Zoom Out</source>
         <translation>缩小</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="72"/>
+        <location filename="GUI/PicWidget.cpp" line="78"/>
         <source>Image Files(*.jpg *.png)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="73"/>
+        <location filename="GUI/PicWidget.cpp" line="79"/>
         <source>select other image to open</source>
         <translation>选择其他图片文件打开</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="169"/>
+        <location filename="GUI/PicWidget.cpp" line="176"/>
+        <location filename="GUI/PicWidget.cpp" line="212"/>
+        <location filename="GUI/PicWidget.cpp" line="220"/>
+        <source>Warning</source>
+        <translation>注意</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="177"/>
+        <location filename="GUI/PicWidget.cpp" line="213"/>
+        <source>Please load image first!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="182"/>
+        <source>Face Detection,Please press second list label until progress finished</source>
+        <translation>人脸识别，请在完成后点击左侧“人脸识别”查看结果</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="183"/>
         <source>Abort Detected</source>
         <translation>终止人脸检测</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="295"/>
+        <location filename="GUI/PicWidget.cpp" line="188"/>
+        <source>Message</source>
+        <translation>提醒</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="221"/>
+        <source>Please execute face detection first!</source>
+        <translation>请首先执行人脸识别！</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="231"/>
+        <source>Choose a floder to save model</source>
+        <translation>选择文件夹保存模型</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="266"/>
+        <source>Face Reconstruction,Please press third list label until progress finished</source>
+        <translation>人脸重建，请进度条完成后点击左侧“人脸重建”标签</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="267"/>
+        <source>Abort Reconstruction</source>
+        <translation>终止重建</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="272"/>
+        <source>Progress</source>
+        <translation>进度条</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="694"/>
+        <source>Warning!</source>
+        <translation>提示！</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="695"/>
+        <source>Program has not detected a face, please change a image</source>
+        <translation>程序没有检测出人脸，请换一张图片</translation>
+    </message>
+    <message>
+        <location filename="GUI/PicWidget.cpp" line="737"/>
         <source>ImageAreaMenu</source>
         <translation>图片区域菜单</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="296"/>
+        <location filename="GUI/PicWidget.cpp" line="738"/>
         <source>ListMenu</source>
         <translation>列表区域菜单</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="298"/>
+        <location filename="GUI/PicWidget.cpp" line="740"/>
         <source>Fit Window</source>
         <translation>适合窗口</translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="301"/>
+        <location filename="GUI/PicWidget.cpp" line="743"/>
         <source>25%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="302"/>
+        <location filename="GUI/PicWidget.cpp" line="744"/>
         <source>50%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="303"/>
+        <location filename="GUI/PicWidget.cpp" line="745"/>
         <source>100%</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="GUI/PicWidget.cpp" line="304"/>
+        <location filename="GUI/PicWidget.cpp" line="746"/>
         <source>200%</source>
         <translation></translation>
     </message>

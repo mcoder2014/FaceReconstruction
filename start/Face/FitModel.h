@@ -71,6 +71,7 @@ signals:
     void signals_msg(QString title, QString msg);   // 输出消息
     void signals_finished();                        // 完成
     void signals_progressValue(int value);          // 进度信息
+    void signals_outPath(QString floderPath, QString objName, QString isoMapName);  // 输出路径
 };
 
 #endif // FITMODEL_H

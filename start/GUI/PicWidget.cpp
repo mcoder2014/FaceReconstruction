@@ -22,6 +22,7 @@ PicWidget::PicWidget(QWidget *parent) :
     this->init();               // 初始化
     this->initConnection();     // 初始化信号槽链接
     this->initThread();
+    this->initOpenGLWidget();
     this->process = none;
     this->markedPoints = NULL;
 }
@@ -268,7 +269,7 @@ void PicWidget::faceReconstruction(int i)
 
     FitModel *fitmodel = FitModel::getInstance();
     progress->setWindowModality(Qt::WindowModal);
-    progress->setWindowTitle(tr("Message"));
+    progress->setWindowTitle(tr("Progress"));
     progress->setValue(0);
     progress->show();
 
@@ -357,6 +358,8 @@ void PicWidget::imageRowSelectedRow(int index)
         // 查看原图时
         if(process != none)
         {
+            ui->imageArea->setVisible(true);
+            ui->openGLWidget->setVisible(false);
             ui->picLabel->setPixmap(
                         QPixmap::fromImage(image));
 
@@ -367,6 +370,8 @@ void PicWidget::imageRowSelectedRow(int index)
         // 查看检测的图片时
         if(process != none && process != loadedImage)
         {
+            ui->imageArea->setVisible(true);
+            ui->openGLWidget->setVisible(false);
             ui->picLabel->setPixmap(
                         QPixmap::fromImage(markedImage));
         }
@@ -376,8 +381,22 @@ void PicWidget::imageRowSelectedRow(int index)
         // 重建后
         if(process == reconstruction)
         {
-            ui->picLabel->setPixmap(
-                        QPixmap::fromImage(isoImage));
+//            ui->picLabel->setPixmap(
+//                        QPixmap::fromImage(isoImage));
+            if(QFile::exists(this->outObjPath))
+            {
+                ui->imageArea->setVisible(false);
+                ui->openGLWidget->setVisible(true);
+
+                ui->openGLWidget->cleanScene();
+                ui->openGLWidget->loadMesh(this->outObjPath);
+                qDebug() << "ui openGLWidget" ;
+            }
+            else
+            {
+                qDebug() << " obj file is not exist";
+            }
+
         }
     }
 
@@ -696,6 +715,20 @@ void PicWidget::handle_fitModelIsoMap(QImage image)
 }
 
 ///
+/// \brief PicWidget::handle_fitModelObjPath
+/// \param floderPath
+/// \param objName
+/// \param isoMapName
+///
+void PicWidget::handle_fitModelObjPath(QString floderPath, QString objName, QString isoMapName)
+{
+    this->outObjPath = floderPath + "/" + objName;
+    this->outIsoMapPath = floderPath + "/" + isoMapName;
+    this->process = reconstruction;
+    this->imageRowSelectedRow(2);
+}
+
+///
 /// \brief PicWidget::init
 ///
 void PicWidget::init()
@@ -720,6 +753,11 @@ void PicWidget::init()
     this->imageAreaContextMenu->addAction(this->action_zoom50);
     this->imageAreaContextMenu->addAction(this->action_zoom100);
     this->imageAreaContextMenu->addAction(this->action_zoom200);
+}
+
+void PicWidget::initOpenGLWidget()
+{
+    ui->openGLWidget->setVisible(false);
 }
 
 ///
@@ -824,6 +862,7 @@ void PicWidget::initThread()
 
     // 将fitmodel塞入分线程
     FitModel *fitModel = FitModel::getInstance();
+    fitModel->moveToThread(&thread_face);
 
     // 链接-执行操作
     connect(this,
@@ -838,6 +877,8 @@ void PicWidget::initThread()
     // 显示消息
     connect(fitModel, SIGNAL(signals_msg(QString,QString)),
             this, SLOT(showMessage(QString,QString)));
+    connect(fitModel, SIGNAL(signals_outPath(QString,QString,QString)),
+            this, SLOT(handle_fitModelObjPath(QString,QString,QString)));
 
     thread_face.start();
 }

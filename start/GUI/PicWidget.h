@@ -12,6 +12,7 @@
 #include <eos/core/Landmark.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include "objViewer/OpenGLWidget.h"
 
 namespace Ui {
 class PicWidget;
@@ -50,7 +51,11 @@ public slots:
 
 private:
     Ui::PicWidget *ui;
-    QString imagePath;
+    OpenGLWidget *openGLWidget;     // 三维场景
+
+    QString imagePath;      // 读取的图片的路径
+    QString outObjPath;     // 输出的Obj图像的路径
+    QString outIsoMapPath;  // 输出的ISO贴图的路径
     QImage image;           // 正在处理的图片的原图
     QImage markedImage;     // 被人脸标记的图片
     QImage isoImage;        // 变形后得到的模型的贴图
@@ -76,6 +81,7 @@ private:
     QAction *action_imageAreaSaveAs;    // 将当前显示的图片导出
 
     void init();            // 初始化一些东西
+    void initOpenGLWidget();    // 初始化OpenGL窗口
     void initConnection();  // 初始化链接
     void initThread();      // 结合多线程做一些初始化
 
@@ -91,6 +97,7 @@ private slots:
 
     void handle_landmarkAllFace(QVector<LandmarkCollection<cv::Vec2f> *> * vector);
     void handle_fitModelIsoMap(QImage image);       // 接收人脸贴图
+    void handle_fitModelObjPath(QString floderPath,QString objName, QString isoMapName);    // 接收生成的路径
 
 signals:
     void signals_landmarkAllFace(QImage image);     // 标记人脸mark点

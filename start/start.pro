@@ -31,7 +31,9 @@ INCLUDEPATH += $$PWD \
                E:/openCV-2.4.11/build/install/include \
                E:/boost1.50/boost_1_50_0 \
                $$PWD/../libs \
-               $$PWD/../libs/eigen-eigen-b9cd8366d4e8
+               $$PWD/../libs/eigen-eigen-b9cd8366d4e8 \
+               E:/libs/assimp-3.3/include \      # assimp的Include文件夹的路径
+
 
 LIBS += -L$$PWD/../libs -ldlib \
 E:\openCV-2.4.11\build\lib\Release\opencv_videostab2411.lib \
@@ -56,6 +58,7 @@ E:\openCV-2.4.11\build\lib\Release\opencv_highgui2411.lib   \
 E:\openCV-2.4.11\build\lib\Release\opencv_imgproc2411.lib \
 E:\openCV-2.4.11\build\lib\Release\opencv_flann2411.lib \
 E:\openCV-2.4.11\build\lib\Release\opencv_core2411.lib  \
+-LE:/libs/assimp-3.3/build/code/Release -lassimp-vc140-mt \  # assimp的lib文件
 
 
 SOURCES += \
@@ -65,7 +68,16 @@ SOURCES += \
     GUI/PicWidget.cpp \
     GUI/ModelViewer.cpp \
     GLOBAL_VAR.cpp \
-    Face/FaceDetection.cpp
+    Face/FaceDetection.cpp \
+    objViewer/Camera3D.cpp \
+    objViewer/CustomMesh.cpp \
+    objViewer/CustomTexture.cpp \
+    objViewer/Input.cpp \
+    objViewer/main.cpp \
+    objViewer/objLoader.cpp \
+    objViewer/OpenGLWidget.cpp \
+    objViewer/Transform3D.cpp \
+    objViewer/Vertex.cpp
 
 HEADERS += \
     GUI/MainWindow.h \
@@ -91,7 +103,15 @@ HEADERS += \
     eos/render/utils.hpp \
     eos/render/detail/render_affine_detail.hpp \
     eos/render/detail/render_detail.hpp \
-    eos/render/detail/texture_extraction_detail.hpp
+    eos/render/detail/texture_extraction_detail.hpp \
+    objViewer/Camera3D.h \
+    objViewer/CustomMesh.h \
+    objViewer/CustomTexture.h \
+    objViewer/Input.h \
+    objViewer/objLoader.h \
+    objViewer/OpenGLWidget.h \
+    objViewer/Transform3D.h \
+    objViewer/Vertex.h
 
 FORMS += \
     GUI/MainWindow.ui \
@@ -99,6 +119,7 @@ FORMS += \
     GUI/ModelViewer.ui
 
 RESOURCES += \
-    resource.qrc
+    resource.qrc \
+    objViewer/objviewer.qrc
 
 TRANSLATIONS = cn_start.ts
