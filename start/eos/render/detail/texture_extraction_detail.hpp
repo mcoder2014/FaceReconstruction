@@ -59,12 +59,12 @@ inline bool is_point_in_triangle(cv::Point2f point, cv::Point2f triV0, cv::Point
 	float dot12 = v1.dot(v2);
 
 	// Compute barycentric coordinates
-	float invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
+    float invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
 	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
 	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
-	// Check if point is in triangle
-	return (u >= 0) && (v >= 0) && (u + v < 1);
+//	// Check if point is in triangle
+    return (u >= 0) && (v >= 0) && (u + v <= 1);
 };
 
 /**

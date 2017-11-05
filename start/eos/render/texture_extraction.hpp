@@ -133,14 +133,27 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 
 	affine_camera_matrix = detail::calculate_affine_z_direction(affine_camera_matrix);
 
-	Mat isomap = Mat::zeros(isomap_resolution, isomap_resolution, CV_8UC4);
+    Mat isomap = Mat::ones(isomap_resolution, isomap_resolution, CV_8UC4);
 	// #Todo: We should handle gray images, but output a 4-channel isomap nevertheless I think.
+    isomap = isomap*255;
+
+//    cv::imwrite("before.jpg", isomap);
+//    cv::imwrite("before1.jpg", image);
 
 	std::vector<std::future<void>> results;
-	for (const auto& triangle_indices : mesh.tvi) {
+    for (const auto& triangle_indices : mesh.tvi)
+    {
 
 		// Note: If there's a performance problem, there's no need to capture the whole mesh - we could capture only the three required vertices with their texcoords.
-		auto extract_triangle = [&mesh, &affine_camera_matrix, &triangle_indices, &depthbuffer, &isomap, &mapping_type, &image, &compute_view_angle]() {
+        auto extract_triangle = [&mesh,
+                &affine_camera_matrix,
+                &triangle_indices,
+                &depthbuffer,
+                &isomap,
+                &mapping_type,
+                &image,
+                &compute_view_angle]()
+        {
 
 			// Find out if the current triangle is visible:
 			// We do a second rendering-pass here. We use the depth-buffer of the final image, and then, here,
@@ -157,10 +170,12 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			const Vec4f v1 = Mat(affine_camera_matrix * Mat(mesh.vertices[triangle_indices[1]]));
 			const Vec4f v2 = Mat(affine_camera_matrix * Mat(mesh.vertices[triangle_indices[2]]));
 
+
             if (!detail::is_triangle_visible(v0, v1, v2, depthbuffer))
             {
                 //continue;
-                return;
+                // 这里是不可见的面片的处理区域，暂时不做处理
+//                return;
             }
 
 			float alpha_value;
@@ -186,14 +201,17 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 				//  *  0 means  90?				//  * -1 means 180?(facing opposite directions)
 				// It's a linear relation, so +0.5 is 45?etc.
 				// An angle larger than 90?means the vertex won't be rendered anyway (because it's back-facing) so we encode 0?to 90?
-                if (angle < 0.0f) {
+                if (angle < 0.0f)
+                {
                     alpha_value = 0.0f;
-                } else {
+                } else
+                {
                     alpha_value = angle * 255.0f;
                 }
 //                alpha_value = 255.0f;
 			}
-			else {
+            else
+            {
 				// no visibility angle computation - if the triangle/pixel is visible, set the alpha chan to 255 (fully visible pixel).
 				alpha_value = 255.0f;
 			}
@@ -202,31 +220,57 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			cv::Point2f src_tri[3];
 			cv::Point2f dst_tri[3];
 
-			Vec4f vec(mesh.vertices[triangle_indices[0]][0], mesh.vertices[triangle_indices[0]][1], mesh.vertices[triangle_indices[0]][2], 1.0f);
+            Vec4f vec(mesh.vertices[triangle_indices[0]][0],
+                    mesh.vertices[triangle_indices[0]][1],
+                    mesh.vertices[triangle_indices[0]][2],
+                    1.0f);
 			Vec4f res = Mat(affine_camera_matrix * Mat(vec));
 			src_tri[0] = Vec2f(res[0], res[1]);
 
-			vec = Vec4f(mesh.vertices[triangle_indices[1]][0], mesh.vertices[triangle_indices[1]][1], mesh.vertices[triangle_indices[1]][2], 1.0f);
+            vec = Vec4f(mesh.vertices[triangle_indices[1]][0],
+                    mesh.vertices[triangle_indices[1]][1],
+                    mesh.vertices[triangle_indices[1]][2],
+                    1.0f);
 			res = Mat(affine_camera_matrix * Mat(vec));
 			src_tri[1] = Vec2f(res[0], res[1]);
 
-			vec = Vec4f(mesh.vertices[triangle_indices[2]][0], mesh.vertices[triangle_indices[2]][1], mesh.vertices[triangle_indices[2]][2], 1.0f);
+            vec = Vec4f(mesh.vertices[triangle_indices[2]][0],
+                    mesh.vertices[triangle_indices[2]][1],
+                    mesh.vertices[triangle_indices[2]][2],
+                    1.0f);
 			res = Mat(affine_camera_matrix * Mat(vec));
 			src_tri[2] = Vec2f(res[0], res[1]);
 
-            dst_tri[0] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[0]][0], isomap.rows*mesh.texcoords[triangle_indices[0]][1] - 1.0f);
-            dst_tri[1] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[1]][0], isomap.rows*mesh.texcoords[triangle_indices[1]][1] - 1.0f);
-            dst_tri[2] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[2]][0], isomap.rows*mesh.texcoords[triangle_indices[2]][1] - 1.0f);
+            // 为啥第二个要减1……
+            dst_tri[0] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[0]][0],
+                    isomap.rows*mesh.texcoords[triangle_indices[0]][1]);
+            dst_tri[1] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[1]][0],
+                    isomap.rows*mesh.texcoords[triangle_indices[1]][1]);
+            dst_tri[2] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[2]][0],
+                    isomap.rows*mesh.texcoords[triangle_indices[2]][1]);
 
 			// Get the inverse Affine Transform from original image: from dst to src
 			Mat warp_mat_org_inv = cv::getAffineTransform(dst_tri, src_tri);
 			warp_mat_org_inv.convertTo(warp_mat_org_inv, CV_32FC1);
 
-			// We now loop over all pixels in the triangle and select, depending on the mapping type, the corresponding texel(s) in the source image
-			for (int x = min(dst_tri[0].x, min(dst_tri[1].x, dst_tri[2].x)); x < max(dst_tri[0].x, max(dst_tri[1].x, dst_tri[2].x)); ++x) {
-				for (int y = min(dst_tri[0].y, min(dst_tri[1].y, dst_tri[2].y)); y < max(dst_tri[0].y, max(dst_tri[1].y, dst_tri[2].y)); ++y) {
-					if (detail::is_point_in_triangle(cv::Point2f(x, y), dst_tri[0], dst_tri[1], dst_tri[2])) {
-						if (mapping_type == TextureInterpolation::Area) {
+            // We now loop over all pixels in the triangle and select,
+            // depending on the mapping type, the corresponding texel(s) in the source image
+            for (int x = min(dst_tri[0].x, min(dst_tri[1].x, dst_tri[2].x)) - 1;
+                 x <= max(dst_tri[0].x, max(dst_tri[1].x, dst_tri[2].x)) + 1;
+                 ++x)
+            {
+                for (int y = min(dst_tri[0].y, min(dst_tri[1].y, dst_tri[2].y)) - 1;
+                     y <= max(dst_tri[0].y, max(dst_tri[1].y, dst_tri[2].y)) + 1;
+                     ++y)
+                {
+                    if (detail::is_point_in_triangle(cv::Point2f(x, y), dst_tri[0], dst_tri[1], dst_tri[2])
+                            || detail::is_point_in_triangle(cv::Point2f(x - 1, y - 1), dst_tri[0], dst_tri[1], dst_tri[2])
+                            || detail::is_point_in_triangle(cv::Point2f(x - 1, y + 1), dst_tri[0], dst_tri[1], dst_tri[2])
+                            || detail::is_point_in_triangle(cv::Point2f(x + 1, y - 1), dst_tri[0], dst_tri[1], dst_tri[2])
+                            || detail::is_point_in_triangle(cv::Point2f(x + 1, y + 1), dst_tri[0], dst_tri[1], dst_tri[2]))
+                    {
+                        if (mapping_type == TextureInterpolation::Area)
+                        {
 
 							// calculate positions of 4 corners of pixel in image (src)
 							Vec3f homogenous_dst_upper_left(x - 0.5f, y - 0.5f, 1.0f);
@@ -262,18 +306,21 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 							}
 							if (num_texels > 0)
 								color = color / num_texels;
-							else { // if no corresponding texel found, nearest neighbour interpolation
+                            else
+                            { // if no corresponding texel found, nearest neighbour interpolation
 								// calculate corresponding position of dst_coord pixel center in image (src)
 								Vec3f homogenous_dst_coord = Vec3f(x, y, 1.0f);
 								Vec2f src_texel = Mat(warp_mat_org_inv * Mat(homogenous_dst_coord));
 
-								if ((cvRound(src_texel[1]) < image.rows) && cvRound(src_texel[0]) < image.cols) {
+                                if ((cvRound(src_texel[1]) < image.rows) && cvRound(src_texel[0]) < image.cols)
+                                {
 									color = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]));
 								}
 							}
 							isomap.at<Vec3b>(y, x) = color;
 						}
-						else if (mapping_type == TextureInterpolation::Bilinear) {
+                        else if (mapping_type == TextureInterpolation::Bilinear)
+                        {
 
 							// calculate corresponding position of dst_coord pixel center in image (src)
 							Vec3f homogenous_dst_coord(x, y, 1.0f);
@@ -304,19 +351,24 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 								isomap.at<Vec3b>(y, x)[color] = color_upper_left + color_upper_right + color_lower_left + color_lower_right;
 							}
 						}
-						else if (mapping_type == TextureInterpolation::NearestNeighbour) {
+                        else if (mapping_type == TextureInterpolation::NearestNeighbour)
+                        {
 
 							// calculate corresponding position of dst_coord pixel center in image (src)
 							const Mat homogenous_dst_coord(Vec3f(x, y, 1.0f));
 							const Vec2f src_texel = Mat(warp_mat_org_inv * homogenous_dst_coord);
 
-							if ((cvRound(src_texel[1]) < image.rows) && (cvRound(src_texel[0]) < image.cols) && cvRound(src_texel[0]) > 0 && cvRound(src_texel[1]) > 0)
+                            if ((cvRound(src_texel[1]) < image.rows)
+                                    && (cvRound(src_texel[0]) < image.cols)
+                                    && cvRound(src_texel[0]) > 0
+                                    && cvRound(src_texel[1]) > 0)
 							{
 								cv::Vec4b isomap_pixel;
 								isomap.at<cv::Vec4b>(y, x)[0] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[0];
 								isomap.at<cv::Vec4b>(y, x)[1] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[1];
 								isomap.at<cv::Vec4b>(y, x)[2] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[2];
-                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
+//                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
+                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(255);
 							}
 						}
 					}
@@ -325,10 +377,14 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 		}; // end lambda auto extract_triangle();
 		results.emplace_back(std::async(extract_triangle));
 	} // end for all mesh.tvi
+
+
+
 	// Collect all the launched tasks:
 	for (auto&& r : results) {
 		r.get();
 	}
+//    cv::imwrite("after.jpg", isomap);
 	return isomap;
 };
 
