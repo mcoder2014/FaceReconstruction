@@ -129,10 +129,11 @@ public:
 	 *
 	 * @return The number of landmark mappings.
 	 */
-	auto size() const
-	{
-		return landmark_mappings.size();
-	};
+
+    int size() const//test
+    {
+        return landmark_mappings.size();
+    };
 
 private:
 	std::map<std::string, std::string> landmark_mappings; ///< Mapping from one landmark name to a name in a different format.
