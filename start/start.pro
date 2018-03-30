@@ -33,7 +33,7 @@ INCLUDEPATH += $$PWD \  # 自身
                E:/libs/boost-1.50-minGW-5.3/build-mingw-static/include/boost-1_50 \ # boost
                $$PWD/../libs \                                      # dlib cereal glm
                $$PWD/../libs/eigen-eigen-b9cd8366d4e8 \             # eigen
-               E:/libs/assimp-3.3-minGW-5.3/assimp-3.3/include \
+               E:/libs/assimp-3.3-minGW-5.3/assimp-3.3/include
 
 
 LIBS += -L$$PWD/../libs -ldlib \                                # dlib 静态文件
