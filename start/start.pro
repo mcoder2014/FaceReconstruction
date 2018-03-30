@@ -123,3 +123,4 @@ RESOURCES += \
     objViewer/objviewer.qrc
 
 TRANSLATIONS = cn_start.ts
+
