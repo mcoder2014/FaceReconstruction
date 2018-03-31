@@ -4,6 +4,10 @@
 #include <QCommandLineOption>
 #include <QObject>
 #include <QDebug>
+#include <QFile>
+#include <QDir>
+
+#include "face/facereconstructiontool.h"
 
 using std::cout;
 using std::endl;
@@ -24,14 +28,16 @@ int main(int argc, char *argv[])
     // image file
     QCommandLineOption imagePathOption(
                 QStringList() << "i" << "image-path",
-                QCoreApplication::translate("main", "The image path to do face reconstruction! <path>"),
-                QCoreApplication::translate("main", "directory"));
+                QCoreApplication::translate("main",
+                    "The image path to do face reconstruction! <path> e.g. E:/test.jpg" ),
+                QCoreApplication::translate("main", "filepath"));
     parser.addOption(imagePathOption);  // 添加选项到程序
 
     // Save path
     QCommandLineOption savePath(
                 QStringList() << "s" << "save-path",
-                QCoreApplication::translate("main", "The directory to save the obj model <path>"),
+                QCoreApplication::translate("main",
+                    "The directory to save the obj model <driectory> e.g. E:/test/"),
                 QCoreApplication::translate("main", "directory"));
     parser.addOption(savePath);
 

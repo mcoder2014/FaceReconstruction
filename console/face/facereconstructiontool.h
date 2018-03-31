@@ -61,6 +61,10 @@ private:
     LandmarkMapper *landmark_mapper;    //LandMark_mapper
 
     QString fileName;                   // 保存出来的文件名称
+
+    QImage isoMap;                      // 保存出的贴图
+
+    QString outputPath;                 // 输出文件夹路径
 };
 
 #endif // FACERECONSTRUCTIONTOOL_H

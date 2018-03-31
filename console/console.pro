@@ -34,7 +34,8 @@ OBJECTS_DIR = ./tmp    # 编译中间文件的位置
 UI_DIR = ./ui          # ui_xxx 文件存放位置
 
 SOURCES += main.cpp \
-    face/facereconstructiontool.cpp
+    face/facereconstructiontool.cpp \
+    ../start/GLOBAL_VAR.cpp
 
 LIBS += -L$$PWD/../libs -ldlib \                                # dlib 静态文件
     # boost
@@ -66,4 +67,23 @@ LIBS += -L$$PWD/../libs -ldlib \                                # dlib 静态文
     ../../../libs/assimp-3.3-minGW-5.3/build/code/libassimp.dll.a             # assimp 静态文件
 
 HEADERS += \
-    face/facereconstructiontool.h
+    face/facereconstructiontool.h \
+    ../start/GLOBAL_VAR.h \
+    ../start/eos/core/Landmark.hpp \
+    ../start/eos/core/LandmarkMapper.hpp \
+    ../start/eos/fitting/affine_camera_estimation.hpp \
+    ../start/eos/fitting/linear_shape_fitting.hpp \
+    ../start/eos/fitting/nonlinear_camera_estimation.hpp \
+    ../start/eos/fitting/detail/nonlinear_camera_estimation_detail.hpp \
+    ../start/eos/morphablemodel/MorphableModel.hpp \
+    ../start/eos/morphablemodel/PcaModel.hpp \
+    ../start/eos/morphablemodel/io/cvssp.hpp \
+    ../start/eos/morphablemodel/io/mat_cerealisation.hpp \
+    ../start/eos/render/Mesh.hpp \
+    ../start/eos/render/render.hpp \
+    ../start/eos/render/render_affine.hpp \
+    ../start/eos/render/texture_extraction.hpp \
+    ../start/eos/render/utils.hpp \
+    ../start/eos/render/detail/render_affine_detail.hpp \
+    ../start/eos/render/detail/render_detail.hpp \
+    ../start/eos/render/detail/texture_extraction_detail.hpp

@@ -98,7 +98,6 @@ void FaceReconstructionTool::fitmodel(QString image_path)
     QImage qimage = this->cvMat2QImage(image);      // 转换为QImage；
 
     // 检测特征点
-    // FaceDetection *detector = FaceDetection::getInstance();
     LandmarkCollection<cv::Vec2f> *landmarks = this->landmark(qimage);     // 先检测特征点
 
     GLOBAL_VAR *global = GLOBAL_VAR::getInstance();
