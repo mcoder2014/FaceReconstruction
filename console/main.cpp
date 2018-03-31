@@ -51,6 +51,10 @@ int main(int argc, char *argv[])
     qDebug() << "image path: " << path_image;
     qDebug() << "save path: " << path_save;
 
-    //return a.exec();
+    // 定义下用来返回的错误代码 enum 之类的
+    // 检查路径上的文件是否存在
+    // 开始人脸识别 识别失败返回错误代码
+    // 人脸重建 重建失败返回错误代码
+    // return a.exec();
     return 0;
 }
