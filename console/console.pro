@@ -1,5 +1,4 @@
-QT += core
-QT -= gui
+QT += core gui
 
 CONFIG += c++11
 
@@ -34,7 +33,8 @@ RCC_DIR = ./rcc        # .qrc文件转换后的位置
 OBJECTS_DIR = ./tmp    # 编译中间文件的位置
 UI_DIR = ./ui          # ui_xxx 文件存放位置
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    face/facereconstructiontool.cpp
 
 LIBS += -L$$PWD/../libs -ldlib \                                # dlib 静态文件
     # boost
@@ -64,3 +64,6 @@ LIBS += -L$$PWD/../libs -ldlib \                                # dlib 静态文
     ../../../libs/opencv2.4.11-minGW5.3/build-mingw-release/lib/libopencv_video2411.dll.a \
     ../../../libs/opencv2.4.11-minGW5.3/build-mingw-release/lib/libopencv_videostab2411.dll.a \
     ../../../libs/assimp-3.3-minGW-5.3/build/code/libassimp.dll.a             # assimp 静态文件
+
+HEADERS += \
+    face/facereconstructiontool.h
