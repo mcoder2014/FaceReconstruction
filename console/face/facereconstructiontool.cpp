@@ -36,6 +36,7 @@ FaceReconstructionTool::FaceReconstructionTool(QObject *parent) : QObject(parent
     {
         this->landmark_mapper = new LandmarkMapper(mappingsfile.toStdString());
     }
+    this->fileName = "model";
 }
 
 LandmarkCollection<cv::Vec2f> *FaceReconstructionTool::landmark(QString filePath)
@@ -84,155 +85,6 @@ LandmarkCollection<cv::Vec2f> *FaceReconstructionTool::landmark(QImage image)
     //  只检测处理第一张人脸
     full_object_detection shape = sp(*img, dets[0]);     // 检测
     return this->buildLandMarks(shape);
-}
-
-///
-/// \brief FaceReconstructionTool::fitmodel
-/// \param image_path
-///
-void FaceReconstructionTool::fitmodel(QString image_path)
-{
-    // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
-    Mat image = cv::imread(image_path.toStdString());
-
-    QImage qimage = this->cvMat2QImage(image);      // 转换为QImage；
-
-    // 检测特征点
-    LandmarkCollection<cv::Vec2f> *landmarks = this->landmark(qimage);     // 先检测特征点
-
-    GLOBAL_VAR *global = GLOBAL_VAR::getInstance();
-
-    // 可形变的模型
-    morphablemodel::MorphableModel morphable_model;
-    try
-    {
-        morphable_model = morphablemodel::load_model(
-                    global->getMorphableModel().toStdString());
-    }
-    catch (const std::runtime_error& e)
-    {
-        cout << "Error loading the Morphable Model: " << e.what() << endl;
-        return;
-    }
-
-    // These will be the final 2D and 3D points used for the fitting:
-    std::vector<cv::Vec4f> model_points; // the points in the 3D shape model
-    std::vector<int> vertex_indices; // their vertex indices
-    std::vector<cv::Vec2f> image_points; // the corresponding 2D landmark points
-    // Sub-select all the landmarks which we have a mapping for (i.e. that are defined in the 3DMM):
-
-    for (int i = 0; i < landmarks->size(); ++i)
-    {
-        auto converted_name = landmark_mapper->convert((*landmarks)[i].name);
-        if (!converted_name)
-        {
-            // no mapping defined for the current landmark
-            continue;
-        }
-
-        // 转换为int值
-        int vertex_idx = std::stoi(converted_name.get());
-        //int vertex_idx = QString::fromStdString(
-        //            converted_name.get()).toInt();
-
-        Vec4f vertex = morphable_model.get_shape_model().get_mean_at_point(vertex_idx);
-        model_points.emplace_back(vertex);
-        vertex_indices.emplace_back(vertex_idx);
-        image_points.emplace_back((*landmarks)[i].coordinates);
-    }
-
-    /// Keegan.Ren
-    std::cout << "model_point = " << endl;
-    std::cout << "count model points:" << morphable_model.get_shape_model().get_mean().rows / 3.0 << endl;
-    for (int i = 0; i < landmarks->size(); ++i) {
-        //         3d points                                                    2d points
-        std::cout << model_points[i] << "\t"
-                  << vertex_indices[i] << "\t"
-                  << image_points[i] << endl;
-    }
-
-    // Estimate the camera (pose) from the 2D - 3D point correspondences
-    fitting::OrthographicRenderingParameters rendering_params
-            = fitting::estimate_orthographic_camera(
-                image_points,
-                model_points,
-                image.cols,
-                image.rows);
-
-    /// Keegan.Ren
-    std::cout << "rendering_params = ";
-    std::cout << rendering_params.r_x << " "
-              << rendering_params.r_y << " "
-              << rendering_params.r_z << " "
-              << rendering_params.t_x << " "
-              << rendering_params.t_y << endl;
-
-    std::cout << "frustum : "
-              << rendering_params.frustum.b << " "
-              << rendering_params.frustum.l << " "
-              << rendering_params.frustum.r << " "
-              << rendering_params.frustum.t << endl;
-
-    Mat affine_from_ortho = get_3x4_affine_camera_matrix(
-                rendering_params,
-                image.cols,
-                image.rows);
-
-    // Estimate the shape coefficients by fitting the shape to the landmarks:
-    //                                                                    bin模型           投影矩阵              图片二维点
-
-    std::vector<float> fitted_coeffs = fitting::fit_shape_to_landmarks_linear(
-                morphable_model,
-                affine_from_ortho,
-                image_points,
-                vertex_indices);
-
-    // Keegan
-    cout << "affine_from_ortho = " << endl;
-    cout << affine_from_ortho << endl;
-
-    // The 3D head pose can be recovered as follows:
-    float xaw_angle = glm::degrees(rendering_params.r_x);
-    float yaw_angle = glm::degrees(rendering_params.r_y);
-    float zaw_angle = glm::degrees(rendering_params.r_z);
-    cout << "x_y_z_angle = ";
-    cout << xaw_angle << "\t" << yaw_angle << "\t" << zaw_angle << endl;
-    // and similarly for pitch (r_x) and roll (r_z).
-
-
-    cout << "size = " << fitted_coeffs.size() << endl;
-    for (int i = 0; i < fitted_coeffs.size(); ++i)
-        cout << fitted_coeffs[i] << endl;
-
-    // Obtain the full mesh with the estimated coefficients:
-    render::Mesh mesh = morphable_model.draw_sample(
-                fitted_coeffs,
-                std::vector<float>());
-
-    // Extract the texture from the image using given mesh and camera parameters:
-    Mat isomap = render::extract_texture(
-                mesh,
-                affine_from_ortho,
-                image);
-
-    //cv::imshow("isomap_png", isomap);
-    //cv::waitKey(1);
-
-    this->isoMap = this->cvMat2QImage(isomap);
-
-    // Save the mesh as textured obj:
-    QString objPath = this->outputPath + "/" + this->fileName + ".obj";
-    QString isoMapPath = this->outputPath + "/" + this->fileName + ".isomap.png";
-
-    qDebug() << "objPath: " << objPath
-             << "isoMapPath: "<< isoMapPath;
-
-    render::write_textured_obj(
-                mesh,
-                objPath.toStdString());
-
-    QImage qisomap = this->cvMat2QImage(isomap);
-    qisomap.save(isoMapPath);
 }
 
 ///
@@ -328,6 +180,156 @@ cv::Mat FaceReconstructionTool::QImage2cvMat(QImage image)
         break;
     }
     return mat;
+}
+
+///
+/// \brief FaceReconstructionTool::Reconstruction
+/// \param image_path   The full path of image e.g. E:/test.jpg
+/// \param save_path    The directory of path to save the model, e.g. E:/test/
+///     The model file: model.obj, model.iso.jpg, model.mtl
+/// \return 1 for success , 0 for error, -1 for load MorphableModel failed.
+///
+int FaceReconstructionTool::Reconstruction(QString image_path, QString save_path)
+{
+
+    // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
+    Mat image = cv::imread(image_path.toStdString());
+
+    QImage qimage = this->cvMat2QImage(image);      // 转换为 QImage;
+
+    // 检测特征点
+    LandmarkCollection<cv::Vec2f> *landmarks = this->landmark(qimage);     // 先检测特征点
+
+    // 加载可形变模型
+    GLOBAL_VAR *global = GLOBAL_VAR::getInstance();
+    morphablemodel::MorphableModel morphable_model;
+    try
+    {
+        morphable_model = morphablemodel::load_model(
+                    global->getMorphableModel().toStdString());
+    }
+    catch (const std::runtime_error& e)
+    {
+        cout << "Error loading the Morphable Model: " << e.what() << endl;
+        return -1;
+    }
+
+    // These will be the final 2D and 3D points used for the fitting:
+    std::vector<cv::Vec4f> model_points; // the points in the 3D shape model
+    std::vector<int> vertex_indices; // their vertex indices
+    std::vector<cv::Vec2f> image_points; // the corresponding 2D landmark points
+    // Sub-select all the landmarks which we have a mapping for (i.e. that are defined in the 3DMM):
+
+    for (int i = 0; i < landmarks->size(); ++i)
+    {
+        auto converted_name = landmark_mapper->convert((*landmarks)[i].name);
+        if (!converted_name)
+        {
+            // no mapping defined for the current landmark
+            continue;
+        }
+
+        // 转换为int值
+        int vertex_idx = std::stoi(converted_name.get());
+
+        Vec4f vertex = morphable_model.get_shape_model().get_mean_at_point(vertex_idx);
+        model_points.emplace_back(vertex);
+        vertex_indices.emplace_back(vertex_idx);
+        image_points.emplace_back((*landmarks)[i].coordinates);
+    }
+
+    /// Debug info
+    std::cout << "model_point = " << endl;
+    std::cout << "count model points:" << morphable_model.get_shape_model().get_mean().rows / 3.0 << endl;
+    for (int i = 0; i < landmarks->size(); ++i) {
+        //         3d points                                                    2d points
+        std::cout << model_points[i] << "\t"
+                  << vertex_indices[i] << "\t"
+                  << image_points[i] << endl;
+    }
+
+    // Estimate the camera (pose) from the 2D - 3D point correspondences
+    fitting::OrthographicRenderingParameters rendering_params
+            = fitting::estimate_orthographic_camera(
+                image_points,
+                model_points,
+                image.cols,
+                image.rows);
+
+    /// Debug info
+    std::cout << "rendering_params = ";
+    std::cout << rendering_params.r_x << " "
+              << rendering_params.r_y << " "
+              << rendering_params.r_z << " "
+              << rendering_params.t_x << " "
+              << rendering_params.t_y << endl;
+
+    std::cout << "frustum : "
+              << rendering_params.frustum.b << " "
+              << rendering_params.frustum.l << " "
+              << rendering_params.frustum.r << " "
+              << rendering_params.frustum.t << endl;
+
+    Mat affine_from_ortho = get_3x4_affine_camera_matrix(
+                rendering_params,
+                image.cols,
+                image.rows);
+
+    // Estimate the shape coefficients by fitting the shape to the landmarks:
+    // bin模型           投影矩阵              图片二维点;
+
+    std::vector<float> fitted_coeffs = fitting::fit_shape_to_landmarks_linear(
+                morphable_model,
+                affine_from_ortho,
+                image_points,
+                vertex_indices);
+
+    // Debug Info
+    cout << "affine_from_ortho = " << endl;
+    cout << affine_from_ortho << endl;
+
+    // The 3D head pose can be recovered as follows:
+    float xaw_angle = glm::degrees(rendering_params.r_x);
+    float yaw_angle = glm::degrees(rendering_params.r_y);
+    float zaw_angle = glm::degrees(rendering_params.r_z);
+    cout << "x_y_z_angle = ";
+    cout << xaw_angle << "\t" << yaw_angle << "\t" << zaw_angle << endl;
+    // and similarly for pitch (r_x) and roll (r_z).
+
+
+    cout << "size = " << fitted_coeffs.size() << endl;
+    for (int i = 0; i < fitted_coeffs.size(); ++i)
+        cout << fitted_coeffs[i] << endl;
+
+    // Obtain the full mesh with the estimated coefficients:
+    render::Mesh mesh = morphable_model.draw_sample(
+                fitted_coeffs,
+                std::vector<float>());
+
+    // Extract the texture from the image using given mesh and camera parameters:
+    Mat isomap = render::extract_texture(
+                mesh,
+                affine_from_ortho,
+                image);
+
+    this->isoMap = this->cvMat2QImage(isomap);
+
+    // Save the mesh as textured obj:
+    this->outputPath = save_path;       // 设置保存路径
+    QString objPath = this->outputPath + "/" + this->fileName + ".obj";
+    QString isoMapPath = this->outputPath + "/" + this->fileName + ".isomap.png";
+
+    qDebug() << "objPath: " << objPath
+             << "isoMapPath: "<< isoMapPath;
+
+    render::write_textured_obj(
+                mesh,
+                objPath.toStdString());         // 保存 obj 模型
+
+    QImage qisomap = this->cvMat2QImage(isomap);
+    qisomap.save(isoMapPath);                   //  保存 isomap
+
+    return 1;
 }
 
 ///

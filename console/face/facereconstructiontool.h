@@ -47,10 +47,11 @@ public:
 
     LandmarkCollection<cv::Vec2f> *landmark(QString filePath);          // 标记landMark-第一张人脸
     LandmarkCollection<cv::Vec2f> *landmark(QImage image);              // 标记landMark-第一张人脸
-    void fitmodel(QString image_path);          // 生成人脸模型
 
     QImage cvMat2QImage(const cv::Mat& mat);    // cvMat转换为QImage
     cv::Mat QImage2cvMat(QImage image);         // QImage 转化为cvMat
+
+    int Reconstruction(QString image_path, QString save_path);          // 重建人脸
 
 private:
     LandmarkCollection<cv::Vec2f> *buildLandMarks(full_object_detection shape);

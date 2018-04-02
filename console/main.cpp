@@ -12,6 +12,16 @@
 using std::cout;
 using std::endl;
 
+///
+/// \brief The main_code enum
+/// 简单定义了一个返回值的枚举类型
+enum main_code
+{
+    success = 0,
+    image_not_exist = 1,
+    face_not_detected = 2
+};
+
 int main(int argc, char *argv[])
 {
     // 设置程序相关信息
@@ -55,6 +65,18 @@ int main(int argc, char *argv[])
     // 检查路径上的文件是否存在
     // 开始人脸识别 识别失败返回错误代码
     // 人脸重建 重建失败返回错误代码
-    // return a.exec();
-    return 0;
+
+    QFile imageFile(path_image);
+    if(!imageFile.exists())
+    {
+        // 如果图片不存在
+        qDebug() << "The image path is wrong, not found!";
+        return main_code::image_not_exist;
+    }
+
+    // 初始化人脸重建工具
+    FaceReconstructionTool faceReconstructionTool;
+    faceReconstructionTool.Reconstruction(path_image, path_save);   // 重建并保存人脸图片
+
+    return main_code::success;
 }
