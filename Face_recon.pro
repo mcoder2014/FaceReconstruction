@@ -2,6 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     start  \
-    console
+    console \
+    faceRecServer
 
 CONFIG += ordered warn_on qt

@@ -309,6 +309,7 @@ void FitModel::thread_fitModel(
 {
     // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
     Mat image = cv::imread(image_path.toStdString());
+    qDebug() << "image read type: " <<image.type();
 
     emit this->signals_progressValue(5);               // 进度条信息
 
