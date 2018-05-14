@@ -73,18 +73,22 @@ unix {
     INCLUDEPATH += $$PWD \  # 自身
                    $$PWD/../start \ # start 项目 本来没打算做这个导致很多代码都放在了那里
                    $$PWD/../libs \
+                   $$PWD/../libs/dlib-18.17 \                          # dlib
                    $$PWD/../libs/eigen-eigen-b9cd8366d4e8 \            # eigen
-                   /usr/include \                                      # boost assimp opencv
-                   /usr/local/include                                  # dlib
+                   /usr/include \                                      # boost assimp
+                   /usr/local/include                                  # opencv
+                   #/usr/local/include                                  # dlib
 
-    LIBS += -L/usr/local/lib -ldlib \                                                               # dlib
+    LIBS += \ #-L/usr/local/lib -ldlib \
+            \ #-L/mnt/e/libs/dlibs-18.17-minGW-5.3/dlib-18.17/build -ldlib \            # dlib
+            -L /home/chaoqun/dlib-18.17/build -ldlib \
             -L/usr/lib/x86_64-linux-gnu -lboost_system -lboost_filesystem \                         # boost
-            -L/usr/lib/x86_64-linux-gnu -lopencv_calib3d -lopencv_contrib -lopencv_core \
+            -L/usr/local/lib -lopencv_calib3d -lopencv_contrib -lopencv_core \
                 -lopencv_features2d -lopencv_flann -lopencv_gpu \
                 -lopencv_highgui -lopencv_imgproc -lopencv_legacy \
                 -lopencv_ml -lopencv_objdetect \
                 -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres \
-                -lopencv_video -lopencv_videostab \                      # opencv
+                -lopencv_video -lopencv_videostab \                                                 # opencv
             -L/usr/lib/x86_64-linux-gnu -lassimp                                                    # assimp
 }
 

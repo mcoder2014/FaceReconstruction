@@ -755,16 +755,16 @@ void PicWidget::handle_fitModelObjPath(QString floderPath, QString objName, QStr
 void PicWidget::init()
 {
     // QMenu
-    this->imageAreaContextMenu = new QMenu(tr("ImageAreaMenu"));
-    this->listWidgetContextMenu = new QMenu(tr("ListMenu"));
+    this->imageAreaContextMenu = new QMenu(tr("ImageAreaMenu"), nullptr);
+    this->listWidgetContextMenu = new QMenu(tr("ListMenu"),nullptr);
 
-    this->action_fitWindow = new QAction(tr("Fit Window"));     // fitWindow
-    this->action_zoomIn = new QAction(tr("Zoom In"));           // zoomIn
-    this->action_zoomOut = new QAction(tr("Zoom Out"));         // zoomOut
-    this->action_zoom25 = new QAction(tr("25%"));               // 缩放到 25%
-    this->action_zoom50 = new QAction(tr("50%"));               // 缩放到 50%
-    this->action_zoom100 = new QAction(tr("100%"));             // 缩放到 100%
-    this->action_zoom200 = new QAction(tr("200%"));             // 缩放到 200%
+    this->action_fitWindow = new QAction(tr("Fit Window"),nullptr);     // fitWindow
+    this->action_zoomIn = new QAction(tr("Zoom In"),nullptr);           // zoomIn
+    this->action_zoomOut = new QAction(tr("Zoom Out"),nullptr);         // zoomOut
+    this->action_zoom25 = new QAction(tr("25%"),nullptr);               // 缩放到 25%
+    this->action_zoom50 = new QAction(tr("50%"),nullptr);               // 缩放到 50%
+    this->action_zoom100 = new QAction(tr("100%"),nullptr);             // 缩放到 100%
+    this->action_zoom200 = new QAction(tr("200%"),nullptr);             // 缩放到 200%
 
     // imageArea
     this->imageAreaContextMenu->addAction(this->action_fitWindow);

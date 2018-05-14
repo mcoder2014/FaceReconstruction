@@ -37,40 +37,40 @@ void MainWindow::init()
     // 初始化QAction
 
     // 打开图片
-    this->action_addimage = new QAction(tr("open Image Files"));
+    this->action_addimage = new QAction(tr("open Image Files"),nullptr);
     this->action_addimage->setStatusTip(tr("Select a image and open it"));
     this->action_addimage->setIcon(QIcon(":/img/sources/iconImg.png"));
 
     // 打开模型-等实现了三维场景后再做s
-    this->action_addObjModel = new QAction(tr("open obj Files"));
+    this->action_addObjModel = new QAction(tr("open obj Files"),nullptr);
     this->action_addObjModel->setStatusTip(tr("Select an obj file and open it"));
 
     // landmark 作人脸标记s
-    this->action_landmark = new QAction(tr("phase landmark"));
+    this->action_landmark = new QAction(tr("phase landmark"),nullptr);
     this->action_landmark->setStatusTip(tr("landmark"));
 
     // fit model
-    this->action_fitmodel = new QAction(tr("phase fit model"));
+    this->action_fitmodel = new QAction(tr("phase fit model"),nullptr);
     this->action_fitmodel->setStatusTip(tr("fit model"));
 
     // face Reconstruction
-    this->action_face_reconstruction = new QAction(tr("face reconstruction"));
+    this->action_face_reconstruction = new QAction(tr("face reconstruction"),nullptr);
     this->action_face_reconstruction->setStatusTip(tr("face reconstruction"));
     this->action_face_reconstruction->setIcon(
                 QIcon(":/img/sources/reconstruction.png"));
 
     // about qt
-    this->action_aboutQt = new QAction(tr("Qt"));
+    this->action_aboutQt = new QAction(tr("Qt"),nullptr);
     this->action_aboutQt->setStatusTip(tr("Tell you about qt"));
 
     // about app
-    this->action_aboutApp = new QAction(tr("App"));
+    this->action_aboutApp = new QAction(tr("App"),nullptr);
     this->action_aboutApp->setStatusTip(tr("Tell you about this app"));
 
     // menu
-    this->menu_file = new QMenu(tr("Files"));
-    this->menu_reconstruction = new QMenu(tr("Reconstruction"));
-    this->menu_about = new QMenu(tr("About"));
+    this->menu_file = new QMenu(tr("Files"), nullptr);
+    this->menu_reconstruction = new QMenu(tr("Reconstruction"),nullptr);
+    this->menu_about = new QMenu(tr("About"),nullptr);
 
     // file
     this->menu_file->addAction(this->action_addimage);

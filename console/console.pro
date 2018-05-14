@@ -69,7 +69,8 @@ unix {
                    #/usr/local/include                                  # dlib
 
     LIBS += \ #-L/usr/local/lib -ldlib \
-            -L/mnt/e/libs/dlibs-18.17-minGW-5.3/dlib-18.17/build -ldlib \            # dlib
+            \ #-L/mnt/e/libs/dlibs-18.17-minGW-5.3/dlib-18.17/build -ldlib \            # dlib
+            -L /home/chaoqun/dlib-18.17/build -ldlib \
             -L/usr/lib/x86_64-linux-gnu -lboost_system -lboost_filesystem \                         # boost
             -L/usr/local/lib -lopencv_calib3d -lopencv_contrib -lopencv_core \
                 -lopencv_features2d -lopencv_flann -lopencv_gpu \
