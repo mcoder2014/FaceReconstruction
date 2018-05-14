@@ -305,14 +305,18 @@ int FaceReconstructionTool::Reconstruction(QString image_path, QString save_path
     render::Mesh mesh = morphable_model.draw_sample(
                 fitted_coeffs,
                 std::vector<float>());
+    qDebug() << "draw sample success";
 
     // Extract the texture from the image using given mesh and camera parameters:
     Mat isomap = render::extract_texture(
                 mesh,
                 affine_from_ortho,
                 image);
+    qDebug() << "extract texture sucess!";
 
     this->isoMap = this->cvMat2QImage(isomap);
+
+    qDebug() << "cvMat2QImage success";
 
     // Save the mesh as textured obj:
     this->outputPath = save_path;       // 设置保存路径

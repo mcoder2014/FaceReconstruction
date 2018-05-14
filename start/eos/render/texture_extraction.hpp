@@ -33,6 +33,7 @@
 #include <tuple>
 #include <cassert>
 #include <future>
+#include <QDebug>
 
 namespace eos {
 	namespace render {
@@ -135,10 +136,6 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 
     Mat isomap = Mat::ones(isomap_resolution, isomap_resolution, CV_8UC4);
 	// #Todo: We should handle gray images, but output a 4-channel isomap nevertheless I think.
-    isomap = isomap*255;
-
-//    cv::imwrite("before.jpg", isomap);
-//    cv::imwrite("before1.jpg", image);
 
 	std::vector<std::future<void>> results;
     for (const auto& triangle_indices : mesh.tvi)
@@ -183,9 +180,13 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			{
 				// Calculate how well visible the current triangle is:
 				// (in essence, the dot product of the viewing direction (0, 0, 1) and the face normal)
-				const Vec3f face_normal = calculate_face_normal(Vec3f(Mat(mesh.vertices[triangle_indices[0]]).rowRange(0, 3)), Vec3f(Mat(mesh.vertices[triangle_indices[1]]).rowRange(0, 3)), Vec3f(Mat(mesh.vertices[triangle_indices[2]]).rowRange(0, 3)));
+                const Vec3f face_normal = calculate_face_normal(
+                        Vec3f(Mat(mesh.vertices[triangle_indices[0]]).rowRange(0, 3)),
+                        Vec3f(Mat(mesh.vertices[triangle_indices[1]]).rowRange(0, 3)),
+                        Vec3f(Mat(mesh.vertices[triangle_indices[2]]).rowRange(0, 3)));
+
 				// Transform the normal to "screen" (kind of "eye") space using the upper 3x3 part of the affine camera matrix (=the translation can be ignored):
-				Vec3f face_normal_transformed = Mat(affine_camera_matrix.rowRange(0, 3).colRange(0, 3) * Mat(face_normal));
+                Vec3f face_normal_transformed = Mat( affine_camera_matrix.rowRange(0, 3).colRange(0, 3) * Mat(face_normal));
 				face_normal_transformed /= cv::norm(face_normal_transformed, cv::NORM_L2); // normalise to unit length
 				// Implementation notes regarding the affine camera matrix and the sign:
 				// If the matrix given were the model_view matrix, the sign would be correct.
@@ -195,6 +196,7 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 				// * affine_camera_matrix includes glm::ortho, which flips z, so we flip the sign of viewing_direction.
 				// We don't need the dot product since viewing_direction.xy are 0 and .z is 1:
 				const float angle = -face_normal_transformed[2]; // flip sign, see above
+
 				assert(angle >= -1.f && angle <= 1.f);
 				// angle is [-1, 1].
 				//  * +1 means   0?(same direction)
@@ -208,7 +210,6 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
                 {
                     alpha_value = angle * 255.0f;
                 }
-//                alpha_value = 255.0f;
 			}
             else
             {
@@ -241,7 +242,6 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 			res = Mat(affine_camera_matrix * Mat(vec));
 			src_tri[2] = Vec2f(res[0], res[1]);
 
-            // 为啥第二个要减1……
             dst_tri[0] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[0]][0],
                     isomap.rows*mesh.texcoords[triangle_indices[0]][1]);
             dst_tri[1] = cv::Point2f(isomap.cols*mesh.texcoords[triangle_indices[1]][0],
@@ -271,85 +271,9 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
                     {
                         if (mapping_type == TextureInterpolation::Area)
                         {
-
-							// calculate positions of 4 corners of pixel in image (src)
-							Vec3f homogenous_dst_upper_left(x - 0.5f, y - 0.5f, 1.0f);
-							Vec3f homogenous_dst_upper_right(x + 0.5f, y - 0.5f, 1.0f);
-							Vec3f homogenous_dst_lower_left(x - 0.5f, y + 0.5f, 1.0f);
-							Vec3f homogenous_dst_lower_right(x + 0.5f, y + 0.5f, 1.0f);
-
-							Vec2f src_texel_upper_left = Mat(warp_mat_org_inv * Mat(homogenous_dst_upper_left));
-							Vec2f src_texel_upper_right = Mat(warp_mat_org_inv * Mat(homogenous_dst_upper_right));
-							Vec2f src_texel_lower_left = Mat(warp_mat_org_inv * Mat(homogenous_dst_lower_left));
-							Vec2f src_texel_lower_right = Mat(warp_mat_org_inv * Mat(homogenous_dst_lower_right));
-
-							float min_a = min(min(src_texel_upper_left[0], src_texel_upper_right[0]), min(src_texel_lower_left[0], src_texel_lower_right[0]));
-							float max_a = max(max(src_texel_upper_left[0], src_texel_upper_right[0]), max(src_texel_lower_left[0], src_texel_lower_right[0]));
-							float min_b = min(min(src_texel_upper_left[1], src_texel_upper_right[1]), min(src_texel_lower_left[1], src_texel_lower_right[1]));
-							float max_b = max(max(src_texel_upper_left[1], src_texel_upper_right[1]), max(src_texel_lower_left[1], src_texel_lower_right[1]));
-
-							cv::Vec3i color;
-							int num_texels = 0;
-
-							for (int a = ceil(min_a); a <= floor(max_a); ++a)
-							{
-								for (int b = ceil(min_b); b <= floor(max_b); ++b)
-								{
-                                    if (detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_upper_left, src_texel_lower_left, src_texel_upper_right)
-                                            || detail::is_point_in_triangle(cv::Point2f(a, b), src_texel_lower_left, src_texel_upper_right, src_texel_lower_right)) {
-										if (a < image.cols && b < image.rows) { // if src_texel in triangle and in image
-											num_texels++;
-											color += image.at<Vec3b>(b, a);
-										}
-									}
-								}
-							}
-							if (num_texels > 0)
-								color = color / num_texels;
-                            else
-                            { // if no corresponding texel found, nearest neighbour interpolation
-								// calculate corresponding position of dst_coord pixel center in image (src)
-								Vec3f homogenous_dst_coord = Vec3f(x, y, 1.0f);
-								Vec2f src_texel = Mat(warp_mat_org_inv * Mat(homogenous_dst_coord));
-
-                                if ((cvRound(src_texel[1]) < image.rows) && cvRound(src_texel[0]) < image.cols)
-                                {
-									color = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]));
-								}
-							}
-							isomap.at<Vec3b>(y, x) = color;
-						}
+                        }
                         else if (mapping_type == TextureInterpolation::Bilinear)
                         {
-
-							// calculate corresponding position of dst_coord pixel center in image (src)
-							Vec3f homogenous_dst_coord(x, y, 1.0f);
-							Vec2f src_texel = Mat(warp_mat_org_inv * Mat(homogenous_dst_coord));
-
-							// calculate distances to next 4 pixels
-							using std::sqrt;
-							using std::pow;
-							float distance_upper_left = sqrt(pow(src_texel[0] - floor(src_texel[0]), 2) + pow(src_texel[1] - floor(src_texel[1]), 2));
-							float distance_upper_right = sqrt(pow(src_texel[0] - floor(src_texel[0]), 2) + pow(src_texel[1] - ceil(src_texel[1]), 2));
-							float distance_lower_left = sqrt(pow(src_texel[0] - ceil(src_texel[0]), 2) + pow(src_texel[1] - floor(src_texel[1]), 2));
-							float distance_lower_right = sqrt(pow(src_texel[0] - ceil(src_texel[0]), 2) + pow(src_texel[1] - ceil(src_texel[1]), 2));
-
-							// normalise distances
-							float sum_distances = distance_lower_left + distance_lower_right + distance_upper_left + distance_upper_right;
-							distance_lower_left /= sum_distances;
-							distance_lower_right /= sum_distances;
-							distance_upper_left /= sum_distances;
-							distance_upper_right /= sum_distances;
-
-							// set color depending on distance from next 4 pixels
-							for (int color = 0; color < 3; ++color) {
-								float color_upper_left = image.at<Vec3b>(floor(src_texel[1]), floor(src_texel[0]))[color] * distance_upper_left;
-								float color_upper_right = image.at<Vec3b>(floor(src_texel[1]), ceil(src_texel[0]))[color] * distance_upper_right;
-								float color_lower_left = image.at<Vec3b>(ceil(src_texel[1]), floor(src_texel[0]))[color] * distance_lower_left;
-								float color_lower_right = image.at<Vec3b>(ceil(src_texel[1]), ceil(src_texel[0]))[color] * distance_lower_right;
-
-								isomap.at<Vec3b>(y, x)[color] = color_upper_left + color_upper_right + color_lower_left + color_lower_right;
-							}
 						}
                         else if (mapping_type == TextureInterpolation::NearestNeighbour)
                         {
@@ -363,12 +287,10 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
                                     && cvRound(src_texel[0]) > 0
                                     && cvRound(src_texel[1]) > 0)
 							{
-								cv::Vec4b isomap_pixel;
 								isomap.at<cv::Vec4b>(y, x)[0] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[0];
 								isomap.at<cv::Vec4b>(y, x)[1] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[1];
 								isomap.at<cv::Vec4b>(y, x)[2] = image.at<Vec3b>(cvRound(src_texel[1]), cvRound(src_texel[0]))[2];
-//                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
-                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(255);
+                                isomap.at<cv::Vec4b>(y, x)[3] = static_cast<uchar>(alpha_value); // pixel is visible
 							}
 						}
 					}
@@ -378,14 +300,17 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 		results.emplace_back(std::async(extract_triangle));
 	} // end for all mesh.tvi
 
+    qDebug() <<"// end for all mesh.tvi";
 
 
 	// Collect all the launched tasks:
 	for (auto&& r : results) {
 		r.get();
 	}
-//    cv::imwrite("after.jpg", isomap);
+    qDebug() <<"// Collect all the launched tasks:";
+
 	return isomap;
+
 };
 
 	} /* namespace render */

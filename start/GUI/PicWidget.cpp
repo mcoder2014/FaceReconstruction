@@ -419,6 +419,7 @@ QImage PicWidget::drawLandMark(
     pen.setWidth(5);    // 线条粗细
     painter.setPen(pen);
 
+    /*
     for(int face = 0; face < marks->size(); face ++)
     {
         // 依次处理每张脸
@@ -674,6 +675,26 @@ QImage PicWidget::drawLandMark(
         painter.drawPath(mouth);
 
     }
+    */
+
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(Qt::red);
+    pen.setBrush(brush);
+    pen.setWidth(10);    // 线条粗细
+    painter.setPen(pen);
+
+    for(int face = 0; face < marks->size(); face ++)
+    {
+        // 依次处理每张脸
+        LandmarkCollection<cv::Vec2f> *landmarks = marks->operator [](face);
+
+        for(int i =0; i < 68; i++)
+        {
+            painter.drawPoint((*landmarks)[i].coordinates[0],(*landmarks)[i].coordinates[1]);
+        }
+
+    }
+    markedImage.save("E:/test.png");
 
     return markedImage;
 }

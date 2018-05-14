@@ -5,4 +5,4 @@ SUBDIRS += \
     console \
     faceRecServer
 
-CONFIG += ordered warn_on qt
+CONFIG += ordered warn_on qt c++11
