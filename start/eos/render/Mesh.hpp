@@ -156,7 +156,7 @@ inline void write_textured_obj(Mesh mesh, std::string filename)
     boost::filesystem::path mtl_filename(filename);
     mtl_filename.replace_extension(".mtl");
 
-    obj_file << "mtllib " << mtl_filename.string() << std::endl; // first line of the obj file
+    obj_file << "mtllib " << mtl_filename.filename().string() << std::endl; // first line of the obj file
 
     // same as in write_obj():
     if (mesh.colors.empty()) {
@@ -189,7 +189,7 @@ inline void write_textured_obj(Mesh mesh, std::string filename)
     texture_filename.replace_extension(".isomap.png");
 
     mtl_file << "newmtl FaceTexture" << std::endl;
-    mtl_file << "map_Kd " << texture_filename.string() << std::endl;
+    mtl_file << "map_Kd " <<texture_filename.filename().string() << std::endl;
 
     return;
 };

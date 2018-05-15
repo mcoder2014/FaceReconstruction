@@ -3,6 +3,8 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QFileInfo>
+#include <QDir>
 #include "CustomMesh.h"
 
 objLoader::objLoader(QObject *parent) : QObject(parent)
@@ -353,6 +355,9 @@ CustomMesh *objLoader::loadMesh(QString filePath)
         int mat_index = aimesh->mMaterialIndex;     // 获得材质
         aiMaterial *mat = scene->mMaterials[mat_index]; // material
 
+        QFileInfo fileinfo(filePath);
+        QDir floderPath = fileinfo.absoluteDir();
+
         // Diffuse
         qDebug() << "Diffuse Map Num:" << mat->GetTextureCount(aiTextureType_DIFFUSE);
         if(mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
@@ -360,7 +365,7 @@ CustomMesh *objLoader::loadMesh(QString filePath)
             aiString textPath;
             aiReturn retStatus = mat->GetTexture(aiTextureType_DIFFUSE, 0, &textPath);
             std::string path = textPath.C_Str();
-            QString absolutioinPath = QString::fromStdString(path);
+            QString absolutioinPath = floderPath.absoluteFilePath( QString::fromStdString(path));
 
             qDebug() << "Diffuse Map Path: "<< absolutioinPath;
             CustomTexture *texture = new CustomTexture();
