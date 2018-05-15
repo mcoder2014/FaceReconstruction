@@ -137,20 +137,20 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
     Mat isomap = Mat::ones(isomap_resolution, isomap_resolution, CV_8UC4);
 	// #Todo: We should handle gray images, but output a 4-channel isomap nevertheless I think.
 
-	std::vector<std::future<void>> results;
+//	std::vector<std::future<void>> results;
     for (const auto& triangle_indices : mesh.tvi)
     {
 
 		// Note: If there's a performance problem, there's no need to capture the whole mesh - we could capture only the three required vertices with their texcoords.
-        auto extract_triangle = [&mesh,
-                &affine_camera_matrix,
-                &triangle_indices,
-                &depthbuffer,
-                &isomap,
-                &mapping_type,
-                &image,
-                &compute_view_angle]()
-        {
+//        auto extract_triangle = [&mesh,
+//                &affine_camera_matrix,
+//                &triangle_indices,
+//                &depthbuffer,
+//                &isomap,
+//                &mapping_type,
+//                &image,
+//                &compute_view_angle]()
+//        {
 
 			// Find out if the current triangle is visible:
 			// We do a second rendering-pass here. We use the depth-buffer of the final image, and then, here,
@@ -296,17 +296,17 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 					}
 				}
 			}
-		}; // end lambda auto extract_triangle();
-		results.emplace_back(std::async(extract_triangle));
+//		}; // end lambda auto extract_triangle();
+//		results.emplace_back(std::async(extract_triangle));
 	} // end for all mesh.tvi
 
     qDebug() <<"// end for all mesh.tvi";
 
 
 	// Collect all the launched tasks:
-	for (auto&& r : results) {
-		r.get();
-	}
+//	for (auto&& r : results) {
+//		r.get();
+//	}
     qDebug() <<"// Collect all the launched tasks:";
 
 	return isomap;
