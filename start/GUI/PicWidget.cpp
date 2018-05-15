@@ -416,7 +416,7 @@ QImage PicWidget::drawLandMark(
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(Qt::green);
     pen.setBrush(brush);
-    pen.setWidth(5);    // 线条粗细
+    pen.setWidth(3);    // 线条粗细
     painter.setPen(pen);
 
     /*
@@ -694,7 +694,7 @@ QImage PicWidget::drawLandMark(
         }
 
     }
-    markedImage.save("E:/test.png");
+//    markedImage.save("E:/test.png");
 
     return markedImage;
 }
