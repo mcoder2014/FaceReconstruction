@@ -1,6 +1,7 @@
 #include "facereconstructiontool.h"
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QDebug>
 
 #include <eos/core/LandmarkMapper.hpp>
@@ -191,6 +192,8 @@ cv::Mat FaceReconstructionTool::QImage2cvMat(QImage image)
 ///
 int FaceReconstructionTool::Reconstruction(QString image_path, QString save_path)
 {
+    QFileInfo fileinfo(image_path);
+    this->fileName = fileinfo.baseName();
 
     // 用QImage转换过来的Mat执行会出现错误……而且并不清楚是为啥
     Mat image = cv::imread(image_path.toStdString());
