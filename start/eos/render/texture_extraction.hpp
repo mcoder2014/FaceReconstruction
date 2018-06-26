@@ -134,8 +134,9 @@ inline cv::Mat extract_texture(Mesh mesh, cv::Mat affine_camera_matrix, cv::Mat 
 
 	affine_camera_matrix = detail::calculate_affine_z_direction(affine_camera_matrix);
 
-    Mat isomap = Mat::ones(isomap_resolution, isomap_resolution, CV_8UC4);
-	// #Todo: We should handle gray images, but output a 4-channel isomap nevertheless I think.
+    //Mat isomap = Mat::ones(isomap_resolution, isomap_resolution, CV_8UC4);
+    Mat isomap(isomap_resolution, isomap_resolution, CV_8UC4, cv::Scalar(0,0,0,255));
+    // #Todo: We should handle gray images, but output a 4-channel isomap nevertheless I think.
 
 //	std::vector<std::future<void>> results;
     for (const auto& triangle_indices : mesh.tvi)
